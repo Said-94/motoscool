@@ -362,22 +362,29 @@
     .story { background: var(--bg-0); }
     .scenes { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 44px; counter-reset: sc; }
     .scene { background: var(--bg-2); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
-    .scene svg { width: 100%; height: auto; background: #121216; }
+    .scene-vid { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; background: #0b0c12; }
+    /* Film 4K plein écran (section cinéma) */
+    .cine { position: relative; min-height: min(92vh, 900px); display: flex; align-items: center; overflow: hidden; background: #000; isolation: isolate; }
+    .cine-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+    .cine::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,.72) 40%, rgba(0,0,0,0) 68%), linear-gradient(0deg, var(--bg-0) 0%, rgba(0,0,0,0) 22%), linear-gradient(180deg, var(--bg-0) 0%, rgba(0,0,0,0) 18%); }
+    .cine .wrap { width: 100%; }
+    .cine-txt { max-width: 520px; }
+    .cine-txt h2 { margin: 10px 0 16px; }
+    .cine-txt p { color: var(--muted); font-size: 1.08rem; }
+    /* Silhouette de la dépanneuse qui traverse les fonds sombres */
+    .fx-truck video { position: absolute; left: 0; width: 100%; height: auto; aspect-ratio: 32 / 9; object-fit: cover; opacity: .45; mix-blend-mode: screen; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+    .fx-truck.top video { top: 0; }
+    .fx-truck.bottom video { bottom: 0; }
+    @media (max-width: 760px) {
+      .cine { min-height: 0; display: block; }
+      .cine-vid { position: relative; inset: auto; height: auto; aspect-ratio: 1; z-index: 0; }
+      .cine::before { background: linear-gradient(0deg, var(--bg-0) 0%, rgba(0,0,0,0) 40%); z-index: 1; height: 100vw; }
+      .cine .wrap { position: relative; z-index: 2; margin-top: -18vw; padding-bottom: 40px; }
+      .fx-truck video { opacity: .3; }
+    }
     .scene figcaption { padding: 18px 20px 22px; color: var(--muted); }
     .scene figcaption b { display: block; color: var(--text); font-size: 1.05rem; margin-bottom: 4px; }
     .scene figcaption b::before { counter-increment: sc; content: counter(sc) ". "; color: var(--red); font-family: 'Orbitron', sans-serif; }
-    .smoke circle { fill: #8a8a94; opacity: .45; transform-box: fill-box; transform-origin: center; animation: smoke 2.4s ease-out infinite; }
-    .smoke circle:nth-child(2) { animation-delay: .8s; }
-    .smoke circle:nth-child(3) { animation-delay: 1.6s; }
-    @keyframes smoke { 0% { opacity: .7; transform: translate(0, 0) scale(.5); } 100% { opacity: 0; transform: translate(-12px, -42px) scale(1.7); } }
-    .hz, .beacon { animation: blink 1s steps(1) infinite; }
-    @keyframes blink { 50% { opacity: .15; } }
-    .wave { transform-box: fill-box; transform-origin: center; animation: wave 1.6s ease-out infinite; }
-    @keyframes wave { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
-    .sc2-glow { animation: glow 1.8s ease-in-out infinite; }
-    @keyframes glow { 50% { opacity: .55; } }
-    /* Sans animation : la scène 2 montre l'écran de résultat, pas l'appel */
-    .sc2-callscreen, .sc2-voice { opacity: 0; }
 
     /* Dépannage */
     .tow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start; }
@@ -743,35 +750,6 @@
     <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.7 4.3 3.8 1.6.7 2.2.7 3 .6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></symbol>
     <symbol id="i-external" viewBox="0 0 24 24"><path fill="currentColor" d="M14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3h-7zm5 16H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7z"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24"><path fill="currentColor" d="M4 3h16a2 2 0 012 2v11a2 2 0 01-2 2H9l-5 4v-4a2 2 0 01-2-2V5a2 2 0 012-2zm3 6v2h2V9H7zm4 0v2h2V9h-2zm4 0v2h2V9h-2z"/></symbol>
-    <!-- Dessins des scènes (moto vue de profil, roue, motard) -->
-    <symbol id="s-wheel" viewBox="-15 -15 30 30"><circle r="12" fill="none" stroke="#d8d8de" stroke-width="4"/><path d="M0-10V10M-10 0H10M-7-7 7 7M-7 7 7-7" stroke="#8a8a94" stroke-width="1.2"/><circle r="2.6" fill="#d8d8de"/></symbol>
-    <symbol id="s-bike" viewBox="0 0 120 70" style="overflow:visible">
-      <path d="M22 52 52 46" stroke="#5a5a64" stroke-width="5" stroke-linecap="round"/>
-      <path d="M50 50 18 41l-2 5 32 9z" fill="#9a9aa2"/>
-      <rect x="44" y="36" width="24" height="15" rx="3" fill="#3a3a42"/>
-      <path d="M52 46 60 28 84 22" fill="none" stroke="#5a5a64" stroke-width="4" stroke-linecap="round"/>
-      <path d="M96 52 86 16" stroke="#c8c8ce" stroke-width="4" stroke-linecap="round"/>
-      <path d="M82 15 93 13" stroke="#c8c8ce" stroke-width="3" stroke-linecap="round"/>
-      <path d="M54 26q8-10 26-6l2 8q-16 2-28 2z" fill="#e63027"/>
-      <path d="M28 30q12-6 28-3l-2 4-24 3z" fill="#151518"/>
-      <path d="M12 26 30 28l-2 5-12-1z" fill="#e63027"/>
-      <rect x="10" y="27" width="4" height="4" rx="1" fill="#ff3b30"/>
-      <circle cx="90" cy="24" r="3.5" fill="#ffe9a8"/>
-    </symbol>
-    <symbol id="s-rider" viewBox="0 0 30 70">
-      <path d="M9 42h12l1 26h-5l-2-20-2 20H8z" fill="#26262c"/>
-      <path d="M7 19h16l2 24H5z" fill="#3a3a44"/>
-      <path d="M22 21l5-11" stroke="#3a3a44" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="15" cy="10" r="8" fill="#e63027"/>
-      <path d="M10 8h11v4H10z" fill="#111"/>
-    </symbol>
-    <symbol id="s-rider-sit" viewBox="0 0 120 70" style="overflow:visible">
-      <path d="M40 28 L60 8" stroke="#3a3a44" stroke-width="9" stroke-linecap="round"/>
-      <path d="M58 10 L84 15" stroke="#3a3a44" stroke-width="4" stroke-linecap="round"/>
-      <path d="M40 28 L58 34 L52 46" fill="none" stroke="#26262c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="64" cy="2" r="7" fill="#e63027"/>
-      <path d="M66 -1h6v4h-6z" fill="#111"/>
-    </symbol>
   </svg>
 
   <header id="top">
@@ -833,6 +811,19 @@
     <div class="wrap">
       <span class="kicker">Moto's Cool</span>
       <p id="mtext">Votre moto mérite des <em>techniciens qualifiés,</em> diplômés et expérimentés. Entretien, réparation, dépannage : <em>ne bougez pas, j'arrive !</em></p>
+    </div>
+  </section>
+
+  <!-- CINÉMA : film 4K de la moto en studio -->
+  <section class="cine" aria-labelledby="cine-title">
+    <video class="cine-vid" id="cine-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/hero-poster.jpg" aria-hidden="true" width="1920" height="1080"></video>
+    <div class="wrap">
+      <div class="cine-txt">
+        <span class="kicker rv">Le soin du détail</span>
+        <h2 class="rv" id="cine-title">Chaque moto traitée comme la nôtre.</h2>
+        <p class="rv">Freins, transmission, moteur, électronique : nos techniciens contrôlent chaque pièce et vous expliquent tout avant d'intervenir.</p>
+        <a href="#devis" class="btn btn-red rv">Prendre rendez-vous</a>
+      </div>
     </div>
   </section>
 
@@ -918,7 +909,8 @@
   </section>
 
   <!-- HISTOIRE : EN PANNE ? MOTO'S COOL ARRIVE -->
-  <section class="story" id="en-panne" aria-labelledby="story-title">
+  <section class="story has-fx" id="en-panne" aria-labelledby="story-title">
+    <div class="fx fx-truck top" aria-hidden="true"><video data-autoplay muted loop playsinline preload="none" width="1920" height="540"><source data-src="assets/video/story-5.webm" type="video/webm"><source data-src="assets/video/story-5.mp4" type="video/mp4"></video></div>
     <div class="wrap">
       <span class="kicker rv">Comment ça marche</span>
       <h2 class="rv" id="story-title">En panne ? Moto's Cool arrive.</h2>
@@ -926,128 +918,25 @@
       <ol class="scenes">
         <li>
           <figure class="scene" id="sc1">
-            <svg viewBox="0 0 320 200" role="img" aria-label="Une moto en panne au bord de la route, feux de détresse allumés, de la fumée sort du moteur">
-              <circle cx="272" cy="38" r="14" fill="#2a2a30"/>
-              <rect y="158" width="320" height="42" fill="#1c1c22"/>
-              <path d="M0 181h320" stroke="#3a3a42" stroke-width="3" stroke-dasharray="22 16"/>
-              <path d="M30 158l11-19 11 19z" fill="none" stroke="#ff9f1a" stroke-width="3" stroke-linejoin="round"/>
-              <g class="sc1-bike" transform="translate(84 92)">
-                <use href="#s-bike" width="120" height="70"/>
-                <use href="#s-wheel" x="7" y="37" width="30" height="30"/>
-                <use href="#s-wheel" x="81" y="37" width="30" height="30"/>
-                <circle class="hz" cx="11" cy="29" r="4" fill="#ff9f1a"/>
-                <circle class="hz" cx="99" cy="29" r="4" fill="#ff9f1a"/>
-                <g class="smoke"><circle cx="56" cy="34" r="6"/><circle cx="60" cy="31" r="8"/><circle cx="53" cy="28" r="7"/></g>
-              </g>
-              <use href="#s-rider" x="236" y="90" width="30" height="70"/>
-            </svg>
+            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-1.jpg" aria-label="Film 3D : une moto tombe en panne la nuit au bord de la route, feux de détresse allumés" width="1280" height="800"><source data-src="assets/video/story-1.webm" type="video/webm"><source data-src="assets/video/story-1.mp4" type="video/mp4"></video>
             <figcaption><b>La panne</b>Votre moto s'arrête au bord de la route : fumée, voyant, plus rien ne démarre. Mettez-vous en sécurité.</figcaption>
           </figure>
         </li>
         <li>
           <figure class="scene" id="sc2">
-            <svg viewBox="0 0 320 200" role="img" aria-label="Le motard en panne, à côté de sa moto, regarde son téléphone, recherche Moto's Cool et appelle le garage">
-              <defs><clipPath id="typeclip"><rect class="type-rect" x="226" y="34" width="62" height="16"/></clipPath></defs>
-              <rect y="158" width="320" height="42" fill="#1c1c22"/>
-              <path d="M0 181h320" stroke="#3a3a42" stroke-width="3" stroke-dasharray="22 16"/>
-              <!-- Moto en panne -->
-              <g transform="translate(4 112) scale(.66)">
-                <use href="#s-bike" width="120" height="70"/>
-                <use href="#s-wheel" x="7" y="37" width="30" height="30"/>
-                <use href="#s-wheel" x="81" y="37" width="30" height="30"/>
-                <circle class="hz" cx="11" cy="29" r="4" fill="#ff9f1a"/>
-                <circle class="hz" cx="99" cy="29" r="4" fill="#ff9f1a"/>
-                <g class="smoke"><circle cx="56" cy="34" r="6"/><circle cx="60" cy="31" r="8"/><circle cx="53" cy="28" r="7"/></g>
-              </g>
-              <!-- Le motard regarde son téléphone -->
-              <path d="M148 101 200 16v170l-52-75z" fill="#fff" opacity=".035"/>
-              <g transform="translate(118 88)">
-                <path d="M9 42h12l1 26h-5l-2-20-2 20H8z" fill="#26262c"/>
-                <path d="M7 19h16l2 24H5z" fill="#3a3a44"/>
-                <path d="M20 22l7 10-2-12" fill="none" stroke="#3a3a44" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <g transform="rotate(14 15 10)"><circle cx="15" cy="10" r="8" fill="#e63027"/><path d="M16 7h7v5h-7z" fill="#111"/></g>
-                <rect x="23" y="12" width="7" height="11" rx="1.4" fill="#1f1f24" stroke="#6a6a74" stroke-width=".8"/>
-                <rect class="sc2-glow" x="24.2" y="13.6" width="4.6" height="7.6" fill="#9fd8ff"/>
-                <g class="sc2-voice" fill="none" stroke="#2ecc71" stroke-width="1.4" stroke-linecap="round"><path d="M33 13q3 4 0 8"/><path d="M36 10q5 7 0 14"/></g>
-              </g>
-              <!-- Écran du téléphone en grand -->
-              <rect x="200" y="12" width="104" height="176" rx="14" fill="#1f1f24" stroke="#3a3a42" stroke-width="3"/>
-              <rect x="206" y="26" width="92" height="150" rx="4" fill="#0e0e10"/>
-              <rect x="212" y="34" width="80" height="16" rx="8" fill="#2c2c33"/>
-              <circle cx="220" cy="42" r="3.5" fill="none" stroke="#a3a3ad" stroke-width="1.5"/>
-              <text x="227" y="45.5" clip-path="url(#typeclip)" font-size="8.5" fill="#f2f2f2" font-family="Nunito, sans-serif" font-weight="800">Moto's Cool</text>
-              <g class="sc2-result">
-                <rect x="212" y="58" width="80" height="70" rx="6" fill="#16161a" stroke="#e63027"/>
-                <text x="218" y="73" font-size="8" font-weight="900" font-family="Orbitron, sans-serif" fill="#e63027">MOTO'S <tspan fill="#f2f2f2">COOL</tspan></text>
-                <text x="218" y="85" font-size="6.2" fill="#a3a3ad" font-family="Nunito, sans-serif">Garage moto · Vitry (94)</text>
-                <text x="218" y="96" font-size="6.2" fill="#a3a3ad" font-family="Nunito, sans-serif">Dépannage 75·77·91·94</text>
-                <rect x="218" y="104" width="68" height="17" rx="8.5" fill="#2ecc71"/>
-                <use href="#i-phone" x="225" y="106.5" width="12" height="12" color="#fff"/>
-                <text x="258" y="115.5" text-anchor="middle" font-size="7.5" font-weight="800" fill="#fff" font-family="Nunito, sans-serif">Appeler</text>
-                <rect x="212" y="134" width="80" height="34" rx="6" fill="#17201b"/>
-                <path d="M212 152h80M240 134v34M262 140l20 28" stroke="#2a3a30" stroke-width="2"/>
-                <path d="M252 146c0-4 6-4 6 0 0 3-3 6-3 6s-3-3-3-6z" fill="#e63027"/>
-              </g>
-              <circle class="sc2-tap" cx="256" cy="112.5" r="7" fill="#fff" opacity="0"/>
-              <g class="sc2-callscreen">
-                <rect x="206" y="26" width="92" height="150" rx="4" fill="#0e0e10"/>
-                <text x="252" y="50" text-anchor="middle" font-size="7" fill="#a3a3ad" font-family="Nunito, sans-serif">Appel en cours…</text>
-                <circle cx="252" cy="80" r="17" fill="#e63027"/>
-                <text x="252" y="84" text-anchor="middle" font-size="10" font-weight="900" fill="#fff" font-family="Orbitron, sans-serif">MC</text>
-                <text x="252" y="114" text-anchor="middle" font-size="8.5" font-weight="900" fill="#f2f2f2" font-family="Orbitron, sans-serif">MOTO'S COOL</text>
-                <text x="252" y="127" text-anchor="middle" font-size="7.5" font-weight="800" fill="#f2f2f2" font-family="Nunito, sans-serif">01 43 76 26 38</text>
-                <circle class="wave" cx="252" cy="154" r="11" fill="none" stroke="#2ecc71" stroke-width="2"/>
-                <circle cx="252" cy="154" r="11" fill="#2ecc71"/>
-                <use href="#i-phone" x="245" y="147" width="14" height="14" color="#fff"/>
-              </g>
-            </svg>
+            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-2.jpg" aria-label="Film 3D : le motard cherche Moto's Cool sur son téléphone et appelle le 01 43 76 26 38" width="1280" height="800"><source data-src="assets/video/story-2.webm" type="video/webm"><source data-src="assets/video/story-2.mp4" type="video/mp4"></video>
             <figcaption><b>L'appel</b>En panne, vous cherchez «&nbsp;Moto's Cool&nbsp;» sur votre téléphone et vous nous appelez au 01 43 76 26 38.</figcaption>
           </figure>
         </li>
         <li>
           <figure class="scene" id="sc3">
-            <svg viewBox="0 0 320 200" role="img" aria-label="Le camion de dépannage Moto's Cool arrive près de la moto en panne">
-              <rect y="158" width="320" height="42" fill="#1c1c22"/>
-              <path d="M0 181h320" stroke="#3a3a42" stroke-width="3" stroke-dasharray="22 16"/>
-              <g transform="translate(218 108) scale(.8)">
-                <use href="#s-bike" width="120" height="70"/>
-                <use href="#s-wheel" x="7" y="37" width="30" height="30"/>
-                <use href="#s-wheel" x="81" y="37" width="30" height="30"/>
-                <circle class="hz" cx="11" cy="29" r="4" fill="#ff9f1a"/>
-              </g>
-              <g class="sc3-van" transform="translate(40 76)">
-                <rect x="40" y="0" width="12" height="9" rx="2" class="beacon" fill="#ff9f1a"/>
-                <path d="M0 8h100v58H0z" fill="#e63027"/>
-                <path d="M100 22h26l20 22v22h-46z" fill="#c42820"/>
-                <path d="M106 28h17l14 15h-31z" fill="#20313a"/>
-                <text x="10" y="34" font-size="12" font-weight="900" font-family="Orbitron, sans-serif" fill="#fff">MOTO'S COOL</text>
-                <text x="10" y="50" font-size="8" font-weight="800" font-family="Nunito, sans-serif" fill="#ffe3e1">Dépannage · 01 43 76 26 38</text>
-                <g class="wh" transform="translate(28 68)"><use href="#s-wheel" x="-15" y="-15" width="30" height="30"/></g>
-                <g class="wh" transform="translate(120 68)"><use href="#s-wheel" x="-15" y="-15" width="30" height="30"/></g>
-              </g>
-            </svg>
+            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-3.jpg" aria-label="Film 3D : la dépanneuse Moto's Cool arrive, gyrophares allumés" width="1280" height="800"><source data-src="assets/video/story-3.webm" type="video/webm"><source data-src="assets/video/story-3.mp4" type="video/mp4"></video>
             <figcaption><b>On arrive</b>Le dépanneur Moto's Cool part de l'atelier de Vitry et vous rejoint dans le 75, 77, 91 ou 94.</figcaption>
           </figure>
         </li>
         <li>
           <figure class="scene" id="sc4">
-            <svg viewBox="0 0 320 200" role="img" aria-label="La moto réparée repart avec son motard">
-              <rect y="158" width="320" height="42" fill="#1c1c22"/>
-              <path d="M0 181h320" stroke="#3a3a42" stroke-width="3" stroke-dasharray="22 16"/>
-              <g class="sc4-lines" stroke="#e63027" stroke-width="3" stroke-linecap="round">
-                <path d="M20 112h46"/><path d="M8 128h50"/><path d="M28 144h34"/>
-              </g>
-              <g class="sc4-bike" transform="translate(84 92)">
-                <use href="#s-bike" width="120" height="70"/>
-                <use href="#s-rider-sit" width="120" height="70"/>
-                <g class="wh" transform="translate(22 52)"><use href="#s-wheel" x="-15" y="-15" width="30" height="30"/></g>
-                <g class="wh" transform="translate(96 52)"><use href="#s-wheel" x="-15" y="-15" width="30" height="30"/></g>
-              </g>
-              <g class="sc4-check" transform="translate(270 44)">
-                <circle r="18" fill="#2ecc71"/>
-                <path d="M-8 0l5 6 11-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              </g>
-            </svg>
+            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-4.jpg" aria-label="Film 3D : la moto réparée repart" width="1280" height="800"><source data-src="assets/video/story-4.webm" type="video/webm"><source data-src="assets/video/story-4.mp4" type="video/mp4"></video>
             <figcaption><b>C'est reparti</b>Réparée sur place ou à l'atelier, votre moto repart. Le prix vous a été annoncé avant toute intervention.</figcaption>
           </figure>
         </li>
@@ -1057,6 +946,7 @@
 
   <!-- DÉPANNAGE -->
   <section class="has-fx" id="depannage" aria-labelledby="depannage-title">
+    <div class="fx fx-truck bottom" aria-hidden="true"><video data-autoplay muted loop playsinline preload="none" width="1920" height="540"><source data-src="assets/video/story-5.webm" type="video/webm"><source data-src="assets/video/story-5.mp4" type="video/mp4"></video></div>
     <div class="fx fx-streaks" aria-hidden="true"><i style="--y:14%;--w:220px;--d:9s;--t:-1s"></i><i style="--y:33%;--w:160px;--d:7s;--t:-4s"></i><i style="--y:58%;--w:260px;--d:11s;--t:-6s"></i><i style="--y:22%;--w:120px;--d:8s;--t:-3s"></i><i style="--y:71%;--w:200px;--d:10s;--t:-8s"></i><i style="--y:86%;--w:150px;--d:7.5s;--t:-2s"></i><i style="--y:46%;--w:180px;--d:12s;--t:-9s"></i></div>
     <div class="wrap">
       <div class="tow-grid">
@@ -2342,43 +2232,37 @@
       gsap.fromTo('#truck', { x: -120 }, { x: () => $('#road').clientWidth, ease: 'none', scrollTrigger: { trigger: '#road', start: 'top 95%', end: 'top 25%', scrub: true, invalidateOnRefresh: true } });
       gsap.to('.hero-3d', { yPercent: 22, opacity: 0.25, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
 
-      // Histoire en 4 scènes : petites vidéos en boucle, lues seulement quand elles sont à l'écran
-      const scene = (id, build) => {
-        const tl = gsap.timeline({ paused: true, repeat: -1, repeatDelay: 0.8 });
-        build(tl, s => document.querySelector(`${id} ${s}`));
-        ScrollTrigger.create({ trigger: id, start: 'top bottom', end: 'bottom top', onToggle: st => (st.isActive ? tl.play() : tl.pause()) });
-      };
-      scene('#sc1', (tl, q) => tl
-        .fromTo(q('.sc1-bike'), { x: -200 }, { x: 0, duration: 1.6, ease: 'power2.out' })
-        .fromTo(q('.smoke'), { opacity: 0 }, { opacity: 1, duration: 0.4 })
-        .to({}, { duration: 2.6 }));
-      scene('#sc2', (tl, q) => tl
-        .set(q('.sc2-callscreen'), { opacity: 0 })
-        .set(q('.sc2-voice'), { opacity: 0 })
-        .fromTo(q('.type-rect'), { attr: { width: 0 } }, { attr: { width: 62 }, duration: 1.2, ease: 'steps(11)' }, 0.5)
-        .fromTo(q('.sc2-result'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4 }, '+=0.2')
-        .fromTo(q('.sc2-tap'), { opacity: 0.7, scale: 0.4, transformOrigin: '50% 50%' }, { opacity: 0, scale: 2, duration: 0.5, immediateRender: false }, '+=0.7')
-        .to(q('.sc2-callscreen'), { opacity: 1, duration: 0.3 })
-        .to(q('.sc2-voice'), { opacity: 1, duration: 0.3 }, '<')
-        .to({}, { duration: 2.4 })
-        .to([q('.sc2-callscreen'), q('.sc2-voice'), q('.sc2-result')], { opacity: 0, duration: 0.3 }));
-      scene('#sc3', (tl, q) => tl
-        .fromTo(q('.sc3-van'), { x: -300 }, { x: 0, duration: 2, ease: 'power2.out' })
-        .fromTo(document.querySelectorAll('#sc3 .wh'), { rotation: -900 }, { rotation: 0, transformOrigin: '50% 50%', duration: 2, ease: 'power2.out' }, 0)
-        .to({}, { duration: 2.2 }));
-      scene('#sc4', (tl, q) => tl
-        .set(q('.sc4-bike'), { x: 0 })
-        .fromTo(q('.sc4-check'), { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, ease: 'back.out(2)', duration: 0.5 }, 0.4)
-        .to(q('.sc4-bike'), { x: 260, duration: 1.8, ease: 'power2.in' }, '+=0.8')
-        .fromTo(document.querySelectorAll('#sc4 .wh'), { rotation: 0 }, { rotation: 1080, transformOrigin: '50% 50%', duration: 1.8, ease: 'power2.in' }, '<')
-        .fromTo(q('.sc4-lines'), { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6 }, '<0.6')
-        .to([q('.sc4-check'), q('.sc4-lines')], { opacity: 0, duration: 0.4 }, '+=0.6')
-        .set(q('.sc4-check'), { opacity: 1, scale: 0 }));
 
       gsap.utils.toArray('.rv').forEach(el => gsap.from(el, { y: 60, opacity: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } }));
       gsap.from('.brand', { y: 40, opacity: 0, stagger: 0.06, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: '#brand-grid', start: 'top 85%' } });
       addEventListener('load', () => ScrollTrigger.refresh());
     }
+
+    // ---------- Vidéos (film 4K, scènes 3D, dépanneuse en fond) : chargées et lues seulement à l'écran ----------
+    // Film du studio : 4K sur grand écran net, 1080p sinon, version carrée légère sur mobile
+    const cine = $('#cine-vid');
+    if (cine) {
+      const big = innerWidth * devicePixelRatio > 2600 && !(navigator.connection && navigator.connection.saveData);
+      cine.dataset.src = lightMode ? 'assets/video/hero-mobile.mp4' : big ? 'assets/video/hero-4k.mp4' : 'assets/video/hero-1080.mp4';
+    }
+    const vids = [...document.querySelectorAll('video[data-autoplay]')];
+    const arm = v => {
+      if (v.dataset.armed) return;
+      v.dataset.armed = '1';
+      if (v.dataset.src) v.src = v.dataset.src;
+      v.querySelectorAll('source[data-src]').forEach(s => { s.src = s.dataset.src; });
+      v.load();
+    };
+    if (!reduce && 'IntersectionObserver' in window) {
+      const vio = new IntersectionObserver(entries => entries.forEach(e => {
+        const v = e.target;
+        if (e.isIntersecting && !document.hidden) { arm(v); const p = v.play(); if (p) p.catch(() => {}); }
+        else if (!v.paused) v.pause();
+      }), { rootMargin: '200px 0px' });
+      vids.forEach(v => vio.observe(v));
+      document.addEventListener('visibilitychange', () => { if (document.hidden) vids.forEach(v => v.pause()); });
+    }
+    // Mouvement réduit : seule l'image fixe (poster) reste ; la dépanneuse de fond n'est pas chargée
 
     $('#year').textContent = new Date().getFullYear();
 
