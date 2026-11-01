@@ -224,6 +224,7 @@
     #bike3d { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 1.4s ease; }
     #bike3d.ready { opacity: 1; }
     .hero-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    @media (min-width: 961px) { .hero-vid { opacity: .4; } }
     /* Voile à gauche : la moto reste un décor, le titre et les boutons dominent */
     .hero::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(10,10,12,.92) 0%, rgba(10,10,12,.7) 32%, rgba(10,10,12,0) 62%); }
     #trails { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
@@ -1472,7 +1473,15 @@
     // Mobile ou « économie de données » : au premier geste ; ordinateur : après le chargement, au repos.
     const LENIS_JS = 'https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js';
     const idle = window.requestIdleCallback || (cb => setTimeout(cb, 300));
-    const lightMode = matchMedia('(max-width: 760px)').matches || !!(navigator.connection && navigator.connection.saveData);
+    // Qualité adaptée à l'appareil, pour rester fluide partout :
+    //  - lowEnd : économie de données, réseau 2G/3G, ≤ 2 Go de mémoire ou ≤ 2 cœurs → images fixes seulement, aucune vidéo ni 3D
+    //  - midEnd : ≤ 4 Go ou ≤ 4 cœurs → pas de moto 3D temps réel (remplacée par le film), pas de 4K
+    const conn = navigator.connection || {};
+    const mem = navigator.deviceMemory || 8, cores = navigator.hardwareConcurrency || 8;
+    const lowEnd = !!conn.saveData || /2g|3g/.test(conn.effectiveType || '') || mem <= 2 || cores <= 2;
+    const midEnd = lowEnd || mem <= 4 || cores <= 4;
+    const lightMode = matchMedia('(max-width: 760px)').matches || lowEnd;
+    const staticOnly = reduce || lowEnd;
     // AV1 (30 à 60 % plus léger) seulement si l'appareil le décode de façon fluide et économe, sinon H.264
     const av1Ok = (width, height) => navigator.mediaCapabilities
       ? navigator.mediaCapabilities.decodingInfo({ type: 'file', video: { contentType: `video/mp4; codecs="av01.0.${width > 2048 ? '12' : '08'}M.08"`, width, height, bitrate: 2e6, framerate: 24 } })
@@ -1560,25 +1569,35 @@
       return import('./assets/bike3d.js')
         .then(m => m.init({ hero: $('#bike3d'), tourCanvas: desktop ? $('#tour3d') : null, reduce, mobile: lightMode, site: SITE }))
         .then(onBike)
-        .catch(() => { /* WebGL ou CDN indisponible : le fond dégradé reste, les services restent en liste */ });
+        .catch(() => heroFilm()); // WebGL ou CDN indisponible : le film remplace la moto 3D
     }
-    const startHeavy = () => idle(() => { start3D(); startLenis(); }, { timeout: 2500 });
-    if (lightMode) {
-      // Mobile ou économie de données : pas de moto 3D (3,7 Mo) ; le film en boucle la remplace (≈ 1 Mo)
-      const hv = $('#hero-vid');
+    // Film en boucle derrière le haut de page (portrait sur écran étroit, paysage sinon) ; image fixe seule si staticOnly
+    let heroFilmOn = false;
+    function heroFilm() {
+      if (heroFilmOn) return;
+      heroFilmOn = true;
+      const hv = $('#hero-vid'), tall = innerHeight > innerWidth;
       idle(() => {
-        hv.poster = 'assets/video/hero-portrait.jpg';
+        hv.poster = tall ? 'assets/video/hero-portrait.jpg' : 'assets/video/hero-poster.jpg';
         hv.hidden = false;
-        if (reduce || (navigator.connection && navigator.connection.saveData)) return;
-        av1Ok(720, 1280).then(ok => {
-          hv.src = `assets/video/hero-portrait${ok ? '.av1' : ''}.mp4`;
+        if (staticOnly) return;
+        const name = tall ? 'hero-portrait' : 'hero-1080';
+        av1Ok(tall ? 720 : 1920, tall ? 1280 : 1080).then(ok => {
+          hv.src = `assets/video/${name}${ok ? '.av1' : ''}.mp4`;
+          // Vidéo illisible : on garde l'image fixe
+          hv.addEventListener('error', () => { hv.removeAttribute('src'); hv.load(); }, { once: true });
           const sync = vis => { if (vis && !document.hidden) { const p = hv.play(); if (p) p.catch(() => {}); } else hv.pause(); };
           let vis = false;
           new IntersectionObserver(es => es.forEach(e => sync(vis = e.isIntersecting))).observe(hv);
           document.addEventListener('visibilitychange', () => sync(vis));
         });
       }, { timeout: 2500 });
-    } else if (document.readyState === 'complete') startHeavy(); else addEventListener('load', startHeavy);
+    }
+    const startHeavy = () => idle(() => { start3D(); startLenis(); }, { timeout: 2500 });
+    // Mobile, appareil modeste ou WebGL absent : pas de moto 3D (3,7 à 5,8 Mo) ; le film en boucle la remplace (≈ 1 Mo)
+    const webgl = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } })();
+    if (lightMode || midEnd || !webgl) { heroFilm(); if (!lightMode) startLenis(); }
+    else if (document.readyState === 'complete') startHeavy(); else addEventListener('load', startHeavy);
 
     // ---------- Compteur de vitesse, progression, retour en haut ----------
     const spdEl = $('#spd'), gearEl = $('#gear'), spdBar = $('#spd-bar');
@@ -2358,7 +2377,7 @@
     // Film du studio : 4K sur grand écran net, 1080p sinon, version carrée légère sur mobile
     const cine = $('#cine-vid');
     if (cine) {
-      const big = innerWidth * devicePixelRatio > 2600 && !(navigator.connection && navigator.connection.saveData);
+      const big = innerWidth * devicePixelRatio > 2600 && !midEnd && mem >= 8;
       const base = 'assets/video/' + (lightMode ? 'hero-mobile' : big ? 'hero-4k' : 'hero-1080');
       cine.dataset.src = base + '.mp4';
       const side = lightMode ? 720 : big ? 3840 : 1920;
@@ -2372,9 +2391,15 @@
       v.querySelectorAll('source[data-src]').forEach(s => { s.src = s.dataset.src; });
       v.load();
     };
-    if (!reduce && 'IntersectionObserver' in window) {
+    // Une vidéo qui ne peut pas être lue (format, réseau) laisse simplement son image fixe
+    vids.forEach(v => {
+      const srcs = v.querySelectorAll('source');
+      if (srcs.length) srcs[srcs.length - 1].addEventListener('error', () => { v.dataset.dead = '1'; });
+    });
+    if (!staticOnly && 'IntersectionObserver' in window) {
       const vio = new IntersectionObserver(entries => entries.forEach(e => {
         const v = e.target;
+        if (v.dataset.dead) return;
         if (e.isIntersecting && !document.hidden) { arm(v); const p = v.play(); if (p) p.catch(() => {}); }
         else if (!v.paused) v.pause();
       }), { rootMargin: '200px 0px' });
