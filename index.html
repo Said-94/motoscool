@@ -223,6 +223,7 @@
     .hero-3d { position: absolute; inset: 0; pointer-events: none; }
     #bike3d { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 1.4s ease; }
     #bike3d.ready { opacity: 1; }
+    .hero-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     /* Voile à gauche : la moto reste un décor, le titre et les boutons dominent */
     .hero::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(10,10,12,.92) 0%, rgba(10,10,12,.7) 32%, rgba(10,10,12,0) 62%); }
     #trails { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
@@ -774,7 +775,7 @@
   <main>
   <!-- ACCUEIL -->
   <section class="hero" id="accueil" aria-label="Accueil">
-    <div class="hero-3d" aria-hidden="true"><canvas id="bike3d"></canvas></div>
+    <div class="hero-3d" aria-hidden="true"><canvas id="bike3d"></canvas><video id="hero-vid" class="hero-vid" muted loop playsinline preload="none" hidden></video></div>
     <canvas id="trails" aria-hidden="true"></canvas>
     <div class="wrap">
       <div class="status fade" id="status"><span class="dot"></span><span id="status-txt">Horaires</span></div>
@@ -910,7 +911,7 @@
 
   <!-- HISTOIRE : EN PANNE ? MOTO'S COOL ARRIVE -->
   <section class="story has-fx" id="en-panne" aria-labelledby="story-title">
-    <div class="fx fx-truck top" aria-hidden="true"><video data-autoplay muted loop playsinline preload="none" width="1920" height="540"><source data-src="assets/video/story-5.webm" type="video/webm"><source data-src="assets/video/story-5.mp4" type="video/mp4"></video></div>
+    <div class="fx fx-truck top" aria-hidden="true"><video data-autoplay muted loop playsinline preload="none" width="1920" height="540"><source data-src="assets/video/story-5.av1.mp4" type='video/mp4; codecs="av01.0.08M.08"'><source data-src="assets/video/story-5.webm" type="video/webm"><source data-src="assets/video/story-5.mp4" type="video/mp4"></video></div>
     <div class="wrap">
       <span class="kicker rv">Comment ça marche</span>
       <h2 class="rv" id="story-title">En panne ? Moto's Cool arrive.</h2>
@@ -918,25 +919,25 @@
       <ol class="scenes">
         <li>
           <figure class="scene" id="sc1">
-            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-1.jpg" aria-label="Film 3D : une moto tombe en panne la nuit au bord de la route, feux de détresse allumés" width="1280" height="800"><source data-src="assets/video/story-1.webm" type="video/webm"><source data-src="assets/video/story-1.mp4" type="video/mp4"></video>
+            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-1.jpg" aria-label="Film 3D : une moto tombe en panne la nuit au bord de la route, feux de détresse allumés" width="1280" height="800"><source data-src="assets/video/story-1.av1.mp4" type='video/mp4; codecs="av01.0.08M.08"'><source data-src="assets/video/story-1.webm" type="video/webm"><source data-src="assets/video/story-1.mp4" type="video/mp4"></video>
             <figcaption><b>La panne</b>Votre moto s'arrête au bord de la route : fumée, voyant, plus rien ne démarre. Mettez-vous en sécurité.</figcaption>
           </figure>
         </li>
         <li>
           <figure class="scene" id="sc2">
-            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-2.jpg" aria-label="Film 3D : le motard cherche Moto's Cool sur son téléphone et appelle le 01 43 76 26 38" width="1280" height="800"><source data-src="assets/video/story-2.webm" type="video/webm"><source data-src="assets/video/story-2.mp4" type="video/mp4"></video>
+            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-2.jpg" aria-label="Film 3D : le motard cherche Moto's Cool sur son téléphone et appelle le 01 43 76 26 38" width="1280" height="800"><source data-src="assets/video/story-2.av1.mp4" type='video/mp4; codecs="av01.0.08M.08"'><source data-src="assets/video/story-2.webm" type="video/webm"><source data-src="assets/video/story-2.mp4" type="video/mp4"></video>
             <figcaption><b>L'appel</b>En panne, vous cherchez «&nbsp;Moto's Cool&nbsp;» sur votre téléphone et vous nous appelez au 01 43 76 26 38.</figcaption>
           </figure>
         </li>
         <li>
           <figure class="scene" id="sc3">
-            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-3.jpg" aria-label="Film 3D : la dépanneuse Moto's Cool arrive, gyrophares allumés" width="1280" height="800"><source data-src="assets/video/story-3.webm" type="video/webm"><source data-src="assets/video/story-3.mp4" type="video/mp4"></video>
+            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-3.jpg" aria-label="Film 3D : la dépanneuse Moto's Cool arrive, gyrophares allumés" width="1280" height="800"><source data-src="assets/video/story-3.av1.mp4" type='video/mp4; codecs="av01.0.08M.08"'><source data-src="assets/video/story-3.webm" type="video/webm"><source data-src="assets/video/story-3.mp4" type="video/mp4"></video>
             <figcaption><b>On arrive</b>Le dépanneur Moto's Cool part de l'atelier de Vitry et vous rejoint dans le 75, 77, 91 ou 94.</figcaption>
           </figure>
         </li>
         <li>
           <figure class="scene" id="sc4">
-            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-4.jpg" aria-label="Film 3D : la moto réparée repart" width="1280" height="800"><source data-src="assets/video/story-4.webm" type="video/webm"><source data-src="assets/video/story-4.mp4" type="video/mp4"></video>
+            <video class="scene-vid" data-autoplay muted loop playsinline preload="none" poster="assets/video/story-4.jpg" aria-label="Film 3D : la moto réparée repart" width="1280" height="800"><source data-src="assets/video/story-4.av1.mp4" type='video/mp4; codecs="av01.0.08M.08"'><source data-src="assets/video/story-4.webm" type="video/webm"><source data-src="assets/video/story-4.mp4" type="video/mp4"></video>
             <figcaption><b>C'est reparti</b>Réparée sur place ou à l'atelier, votre moto repart. Le prix vous a été annoncé avant toute intervention.</figcaption>
           </figure>
         </li>
@@ -946,7 +947,7 @@
 
   <!-- DÉPANNAGE -->
   <section class="has-fx" id="depannage" aria-labelledby="depannage-title">
-    <div class="fx fx-truck bottom" aria-hidden="true"><video data-autoplay muted loop playsinline preload="none" width="1920" height="540"><source data-src="assets/video/story-5.webm" type="video/webm"><source data-src="assets/video/story-5.mp4" type="video/mp4"></video></div>
+    <div class="fx fx-truck bottom" aria-hidden="true"><video data-autoplay muted loop playsinline preload="none" width="1920" height="540"><source data-src="assets/video/story-5.av1.mp4" type='video/mp4; codecs="av01.0.08M.08"'><source data-src="assets/video/story-5.webm" type="video/webm"><source data-src="assets/video/story-5.mp4" type="video/mp4"></video></div>
     <div class="fx fx-streaks" aria-hidden="true"><i style="--y:14%;--w:220px;--d:9s;--t:-1s"></i><i style="--y:33%;--w:160px;--d:7s;--t:-4s"></i><i style="--y:58%;--w:260px;--d:11s;--t:-6s"></i><i style="--y:22%;--w:120px;--d:8s;--t:-3s"></i><i style="--y:71%;--w:200px;--d:10s;--t:-8s"></i><i style="--y:86%;--w:150px;--d:7.5s;--t:-2s"></i><i style="--y:46%;--w:180px;--d:12s;--t:-9s"></i></div>
     <div class="wrap">
       <div class="tow-grid">
@@ -1429,6 +1430,11 @@
     const LENIS_JS = 'https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js';
     const idle = window.requestIdleCallback || (cb => setTimeout(cb, 300));
     const lightMode = matchMedia('(max-width: 760px)').matches || !!(navigator.connection && navigator.connection.saveData);
+    // AV1 (30 à 60 % plus léger) seulement si l'appareil le décode de façon fluide et économe, sinon H.264
+    const av1Ok = (width, height) => navigator.mediaCapabilities
+      ? navigator.mediaCapabilities.decodingInfo({ type: 'file', video: { contentType: `video/mp4; codecs="av01.0.${width > 2048 ? '12' : '08'}M.08"`, width, height, bitrate: 2e6, framerate: 24 } })
+        .then(r => r.supported && r.smooth && r.powerEfficient).catch(() => false)
+      : Promise.resolve(false);
     const desktop = matchMedia('(min-width: 761px)').matches;
     let lenis = null;
     // Défilement vers une ancre : Lenis si actif (sous l'en-tête fixe), sinon défilement natif
@@ -1515,9 +1521,20 @@
     }
     const startHeavy = () => idle(() => { start3D(); startLenis(); }, { timeout: 2500 });
     if (lightMode) {
-      const evs = ['pointerdown', 'touchstart', 'scroll', 'keydown'];
-      const go = () => { evs.forEach(ev => removeEventListener(ev, go)); startHeavy(); };
-      evs.forEach(ev => addEventListener(ev, go, { passive: true }));
+      // Mobile ou économie de données : pas de moto 3D (3,7 Mo) ; le film en boucle la remplace (≈ 1 Mo)
+      const hv = $('#hero-vid');
+      idle(() => {
+        hv.poster = 'assets/video/hero-portrait.jpg';
+        hv.hidden = false;
+        if (reduce || (navigator.connection && navigator.connection.saveData)) return;
+        av1Ok(720, 1280).then(ok => {
+          hv.src = `assets/video/hero-portrait${ok ? '.av1' : ''}.mp4`;
+          const sync = vis => { if (vis && !document.hidden) { const p = hv.play(); if (p) p.catch(() => {}); } else hv.pause(); };
+          let vis = false;
+          new IntersectionObserver(es => es.forEach(e => sync(vis = e.isIntersecting))).observe(hv);
+          document.addEventListener('visibilitychange', () => sync(vis));
+        });
+      }, { timeout: 2500 });
     } else if (document.readyState === 'complete') startHeavy(); else addEventListener('load', startHeavy);
 
     // ---------- Compteur de vitesse, progression, retour en haut ----------
@@ -2243,7 +2260,10 @@
     const cine = $('#cine-vid');
     if (cine) {
       const big = innerWidth * devicePixelRatio > 2600 && !(navigator.connection && navigator.connection.saveData);
-      cine.dataset.src = lightMode ? 'assets/video/hero-mobile.mp4' : big ? 'assets/video/hero-4k.mp4' : 'assets/video/hero-1080.mp4';
+      const base = 'assets/video/' + (lightMode ? 'hero-mobile' : big ? 'hero-4k' : 'hero-1080');
+      cine.dataset.src = base + '.mp4';
+      const side = lightMode ? 720 : big ? 3840 : 1920;
+      av1Ok(side, lightMode ? 720 : side * 9 / 16).then(ok => { if (ok && !cine.dataset.armed) cine.dataset.src = base + '.av1.mp4'; });
     }
     const vids = [...document.querySelectorAll('video[data-autoplay]')];
     const arm = v => {

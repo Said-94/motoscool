@@ -8,7 +8,7 @@
  * - API Adresse, fonds de carte OpenStreetMap, proxy de l'assistant IA : jamais mis en cache.
  * Changer VERSION à chaque mise en ligne pour renouveler le cache.
  */
-const VERSION = 'v4-2026-11-01';
+const VERSION = 'v5-2026-11-01';
 const STATIC = `mc-static-${VERSION}`;
 const PAGES = `mc-pages-${VERSION}`;
 const CDN = `mc-cdn-${VERSION}`;
