@@ -413,6 +413,21 @@
     .ti h3 { font-size: 1.2rem; margin-bottom: 8px; }
     .ti p { color: var(--muted); }
     .tow-panel { text-align: center; }
+    .tow-panel .pos-btn { margin-top: 10px; width: 100%; justify-content: center; }
+    .pos-card { margin-top: 14px; padding: 16px; border-radius: 14px; background: var(--bg-3); border: 1px solid var(--line); text-align: left; }
+    .pos-card .addr { font-weight: 800; margin: 0 0 4px; }
+    .pos-card .sub { color: var(--muted); font-size: .9rem; margin: 0 0 12px; }
+    .pos-card .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pos-card .acts .btn { padding: 10px 16px; font-size: .9rem; }
+    .reflexes { margin-top: 20px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 20px; padding: 28px; }
+    .reflexes h3 { font-size: 1.2rem; margin-bottom: 18px; }
+    .rfx { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; counter-reset: rfx; padding: 0; margin: 0; }
+    .rfx li { counter-increment: rfx; position: relative; padding-left: 46px; }
+    .rfx li::before { content: counter(rfx); position: absolute; left: 0; top: 0; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--red); color: #fff; font-family: 'Orbitron', sans-serif; font-weight: 900; }
+    .rfx strong { display: block; margin-bottom: 4px; }
+    .rfx span { color: var(--muted); font-size: .95rem; }
+    .reflexes .note { margin: 16px 0 0; color: var(--muted); font-size: .9rem; }
+    .reflexes .note a { color: var(--red-text); font-weight: 800; }
     .tow-panel .big { font-family: 'Orbitron', sans-serif; font-size: clamp(1.3rem, 3vw, 1.8rem); font-weight: 900; margin: 0 0 4px; }
     .neon { font-family: 'Orbitron', sans-serif; font-size: clamp(1.4rem, 4vw, 2.1rem); font-weight: 900; color: var(--red); display: block; margin: 14px 0 18px; text-shadow: 0 0 8px var(--red), 0 0 30px var(--red), 0 0 60px rgba(230,48,39,.6); animation: neon 4s infinite; }
     @keyframes neon { 0%, 89%, 93%, 100% { opacity: 1; } 90%, 92% { opacity: .35; text-shadow: none; } }
@@ -611,6 +626,16 @@
     .work img { width: 100%; height: 100%; object-fit: cover; }
     .work figcaption { position: absolute; left: 8px; top: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(10,10,12,.8); font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
     .work p { padding: 14px 18px 18px; font-weight: 700; }
+    /* Comparateur avant / après : on fait glisser la ligne */
+    .cmp { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--bg-3); --p: 50%; user-select: none; }
+    .cmp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .cmp .before { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--p)) 0 0); }
+    .cmp .line { position: absolute; top: 0; bottom: 0; left: var(--p); width: 3px; background: #fff; transform: translateX(-50%); box-shadow: 0 0 12px rgba(0,0,0,.6); pointer-events: none; }
+    .cmp .line::after { content: "‹ ›"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--red); color: #fff; font-weight: 900; box-shadow: 0 4px 18px rgba(0,0,0,.5); }
+    .cmp .tag { position: absolute; top: 10px; padding: 2px 10px; border-radius: 999px; background: rgba(10,10,12,.8); font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; pointer-events: none; }
+    .cmp .tag.b { left: 10px; } .cmp .tag.a { right: 10px; }
+    .cmp input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
+    .cmp input:focus-visible ~ .line::after { outline: 3px solid #fff; outline-offset: 3px; }
 
     /* Listes du pied de page (zones et services) */
     .foot-links { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; padding-bottom: 26px; margin-bottom: 26px; border-bottom: 1px solid var(--line); }
@@ -658,11 +683,14 @@
     }
     @media (max-width: 960px) {
       .tow-grid, .quote-grid, .contact-grid, .tow-info, .tarif-grid { grid-template-columns: 1fr; }
+      .rfx { grid-template-columns: 1fr 1fr; }
       .hero-3d { opacity: .4; }
       .zone-map { height: 360px; }
     }
     @media (max-width: 760px) {
       section { padding: 80px 0; }
+      .rfx { grid-template-columns: 1fr; }
+      .reflexes { padding: 22px; }
       .tour-head { padding: 80px 20px 34px; }
       .tour-steps { padding-bottom: 80px; }
       .hpanel { min-height: 0; padding: 30px; }
@@ -986,7 +1014,19 @@
           <p class="big">Ne bougez pas,<br>j'arrive !</p>
           <a href="tel:+33143762638" class="neon">01 43 76 26 38</a>
           <a href="tel:+33143762638" class="btn btn-red"><svg aria-hidden="true"><use href="#i-phone"/></svg>Appeler le dépannage</a>
+          <button class="btn btn-ghost geo-btn pos-btn" type="button" id="send-pos"><svg aria-hidden="true"><use href="#i-locate"/></svg>Envoyer ma position</button>
+          <div class="pos-card" id="pos-card" hidden aria-live="polite"></div>
         </div>
+      </div>
+      <div class="reflexes rv" role="region" aria-labelledby="reflexes-title">
+        <h3 id="reflexes-title">En panne : les 4 bons réflexes</h3>
+        <ol class="rfx">
+          <li><strong>Feux de détresse</strong><span>Allumez-les dès l'arrêt et enfilez votre gilet haute visibilité.</span></li>
+          <li><strong>À l'abri</strong><span>Rangez la moto le plus à droite possible, puis mettez-vous derrière la glissière ou sur le trottoir, jamais sur la chaussée.</span></li>
+          <li><strong>Sur autoroute</strong><span>Appelez depuis une borne orange ou le 112 : sur autoroute, seuls les dépanneurs agréés peuvent intervenir.</span></li>
+          <li><strong>Appelez-nous</strong><span>Donnez votre position, la marque et le modèle de la moto, et ce qui s'est passé.</span></li>
+        </ol>
+        <p class="note">Blessé ou en danger ? Appelez d'abord le <a href="tel:112">112</a>.</p>
       </div>
       <div class="road" id="road" aria-hidden="true"><svg id="truck"><use href="#i-truck"/></svg></div>
     </div>
@@ -1317,6 +1357,9 @@
     // WhatsApp : numéro au format international, chiffres uniquement, sans « + » (ex : '33612345678'). Vide = bouton masqué.
     whatsapp: '',
     whatsappMessage: "Bonjour Moto's Cool, j'ai besoin d'un renseignement pour ma moto : ",
+    // Mobile du dépanneur pour recevoir la position par SMS (ex : '0612345678'). Vide = bouton SMS masqué
+    // (le 01 43 76 26 38 est une ligne fixe : elle ne reçoit pas les SMS).
+    sms: '',
     // Lien vers la fiche d'avis Google du garage (ex : 'https://g.page/r/XXXX/review'). Vide = bouton masqué.
     googleReviewsUrl: '',
     // Réalisations avant / après : vraies photos uniquement, placées dans assets/realisations/. Vide = galerie masquée.
@@ -1672,13 +1715,31 @@
         const g = $('#gallery');
         gallery.forEach(it => {
           const li = document.createElement('li'); li.className = 'work';
-          const pair = document.createElement('div'); pair.className = 'pair';
-          [['Avant', it.avant], ['Après', it.apres]].forEach(([lbl, src]) => {
-            const fig = document.createElement('figure'), img = document.createElement('img'), cap = document.createElement('figcaption');
-            img.src = src; img.loading = 'lazy'; img.decoding = 'async'; img.width = 800; img.height = 600;
-            img.alt = `${lbl} : ${it.alt || it.titre || 'intervention Moto\'s Cool'}`;
-            cap.textContent = lbl; fig.append(img, cap); pair.append(fig);
-          });
+          const what = it.alt || it.titre || "intervention Moto's Cool";
+          const pair = document.createElement('div'); pair.className = 'cmp';
+          const mk = (src, lbl) => { const img = document.createElement('img'); img.src = src; img.loading = 'lazy'; img.decoding = 'async'; img.width = 800; img.height = 600; img.alt = `${lbl} : ${what}`; return img; };
+          const before = document.createElement('div'); before.className = 'before'; before.append(mk(it.avant, 'Avant'));
+          const range = document.createElement('input'); range.type = 'range'; range.min = 0; range.max = 100; range.value = 50;
+          range.setAttribute('aria-label', `Comparer avant et après : ${what}`);
+          const line = document.createElement('span'); line.className = 'line';
+          const tb = document.createElement('span'); tb.className = 'tag b'; tb.textContent = 'Avant';
+          const ta = document.createElement('span'); ta.className = 'tag a'; ta.textContent = 'Après';
+          range.addEventListener('input', () => pair.style.setProperty('--p', range.value + '%'));
+          pair.append(mk(it.apres, 'Après'), before, range, line, tb, ta);
+          // Petit balayage à la première apparition pour montrer que la ligne se déplace
+          if (!reduce && 'IntersectionObserver' in window) {
+            const io = new IntersectionObserver(es => es.forEach(e => {
+              if (!e.isIntersecting) return;
+              io.disconnect();
+              const t0 = performance.now();
+              (function step(t) {
+                const k = Math.min(1, (t - t0) / 1600), v = 50 + Math.sin(k * Math.PI * 2) * 22;
+                if (document.activeElement !== range) { range.value = v; pair.style.setProperty('--p', v + '%'); }
+                if (k < 1) requestAnimationFrame(step);
+              })(t0);
+            }), { threshold: 0.6 });
+            io.observe(pair);
+          }
           const p = document.createElement('p'); p.textContent = it.titre || '';
           li.append(pair); if (it.titre) li.append(p); g.append(li);
         });
@@ -1895,6 +1956,44 @@
         const f = (await r.json()).features[0];
         return f && /^\d{5}$/.test(f.properties.postcode || '') ? f.properties : null;
       } catch (err) { return null; } finally { clearTimeout(timer); }
+    }
+    // « Envoyer ma position » : adresse + lien carte à partager au dépanneur, ou à lire pendant l'appel
+    {
+      const btn = $('#send-pos'), card = $('#pos-card');
+      const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; return e; };
+      const act = (label, href, icon) => {
+        const a = el(href ? 'a' : 'button', 'btn btn-ghost');
+        if (href) { a.href = href; if (href.startsWith('https')) { a.target = '_blank'; a.rel = 'noopener'; } } else a.type = 'button';
+        if (icon) a.insertAdjacentHTML('afterbegin', `<svg aria-hidden="true"><use href="#${icon}"/></svg>`);
+        const t = el('span', '', label); a.append(t); return a;
+      };
+      btn.addEventListener('click', async () => {
+        btn.disabled = true; card.hidden = false; card.replaceChildren(el('p', 'sub', 'Recherche de votre position…'));
+        try {
+          const pos = await locate();
+          const a = await reverseGeocode(pos);
+          const map = `https://maps.google.com/?q=${pos.lat},${pos.lng}`;
+          const addr = a ? a.label : `${pos.lat}, ${pos.lng}`;
+          const msg = `Moto en panne, je suis ici : ${addr} (précision ± ${pos.accuracy} m) ${map}`;
+          const acts = el('div', 'acts');
+          if (navigator.share) {
+            const sh = act('Partager'); acts.append(sh);
+            sh.addEventListener('click', () => navigator.share({ title: "Ma position – Moto's Cool", text: msg }).catch(() => {}));
+          }
+          const sms = String(SITE.sms || '').replace(/[^0-9+]/g, '');
+          if (sms) acts.append(act('Envoyer par SMS', `sms:${sms}?body=${encodeURIComponent(msg)}`));
+          const wa = String(SITE.whatsapp || '').replace(/[^0-9]/g, '');
+          if (wa) acts.append(act('WhatsApp', `https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, 'i-whatsapp'));
+          const copy = act('Copier'); acts.append(copy);
+          copy.addEventListener('click', () => (navigator.clipboard ? navigator.clipboard.writeText(msg) : Promise.reject())
+            .then(() => { copy.lastChild.textContent = 'Copié ✓'; }, () => { copy.lastChild.textContent = 'Copie impossible'; }));
+          acts.append(act('Voir sur la carte', map, 'i-external'));
+          card.replaceChildren(el('p', 'addr', addr),
+            el('p', 'sub', `Précision ± ${pos.accuracy} m. Lisez cette adresse au dépanneur en appelant le ${PHONE}, ou envoyez-la-lui.`), acts);
+        } catch (err) {
+          card.replaceChildren(el('p', 'sub', geoError(err)));
+        } finally { btn.disabled = false; }
+      });
     }
     // Secours hors ligne : département d'après les contours de la zone (test point dans polygone)
     function deptAt(pos) {
