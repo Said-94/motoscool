@@ -326,6 +326,10 @@
     @keyframes blink { 50% { opacity: .15; } }
     .wave { transform-box: fill-box; transform-origin: center; animation: wave 1.6s ease-out infinite; }
     @keyframes wave { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
+    .sc2-glow { animation: glow 1.8s ease-in-out infinite; }
+    @keyframes glow { 50% { opacity: .55; } }
+    /* Sans animation : la scène 2 montre l'écran de résultat, pas l'appel */
+    .sc2-callscreen, .sc2-voice { opacity: 0; }
 
     /* Dépannage */
     .tow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start; }
@@ -743,7 +747,7 @@
     <div class="hs-track" id="hs-track">
       <article class="hpanel"><span class="num" aria-hidden="true">01</span><div class="ico"><svg aria-hidden="true"><use href="#i-gear"/></svg></div><h3>Entretien &amp; révision</h3><p>Vidange, filtres, kit chaîne, contrôle complet selon le carnet constructeur.</p><a href="#devis" class="btn btn-red" data-presta="Entretien">Réserver</a></article>
       <article class="hpanel"><span class="num" aria-hidden="true">02</span><div class="ico"><svg aria-hidden="true"><use href="#i-wrench"/></svg></div><h3>Réparation mécanique</h3><p>Moteur, embrayage, transmission, électricité : nous remettons votre moto en état.</p><a href="#devis" class="btn btn-red" data-presta="Réparation">Réserver</a></article>
-      <article class="hpanel hl"><span class="num" aria-hidden="true">03</span><div class="ico"><svg aria-hidden="true"><use href="#i-truck"/></svg></div><h3>Dépannage 75 · 77 · 91 · 94</h3><p>Des véhicules équipés pour un dépannage rapide à Paris, en Seine-et-Marne, dans l'Essonne et le Val-de-Marne.</p><a href="tel:+33143762638" class="btn">Appeler</a></article>
+      <article class="hpanel hl"><span class="num" aria-hidden="true">03</span><div class="ico"><svg aria-hidden="true"><use href="#i-truck"/></svg></div><h3>Dépannage 75·77·91·94</h3><p>Des véhicules équipés pour un dépannage rapide à Paris, en Seine-et-Marne, dans l'Essonne et le Val-de-Marne.</p><a href="tel:+33143762638" class="btn">Appeler</a></article>
       <article class="hpanel"><span class="num" aria-hidden="true">04</span><div class="ico"><svg aria-hidden="true"><use href="#i-shield"/></svg></div><h3>Diagnostic</h3><p>Recherche de panne sur place : le prix de la réparation est fixé après ce diagnostic.</p><a href="#devis" class="btn btn-red" data-presta="Diagnostic">Réserver</a></article>
       <article class="hpanel"><span class="num" aria-hidden="true">05</span><div class="ico"><svg aria-hidden="true"><use href="#i-check"/></svg></div><h3>Freinage &amp; pneus</h3><p>Plaquettes, disques, purge, pneus et équilibrage : votre sécurité avant tout.</p><a href="#devis" class="btn btn-red" data-presta="Freinage">Réserver</a></article>
       <article class="hpanel"><span class="num" aria-hidden="true">06</span><div class="ico"><svg aria-hidden="true"><use href="#i-gear"/></svg></div><h3>Scooters</h3><p>Piaggio, Vespa et scooters de toutes cylindrées, entretenus avec le même soin.</p><a href="#devis" class="btn btn-red" data-presta="Entretien">Réserver</a></article>
@@ -816,27 +820,62 @@
         </li>
         <li>
           <figure class="scene" id="sc2">
-            <svg viewBox="0 0 320 200" role="img" aria-label="Sur son téléphone, le motard recherche Moto's Cool et appelle le garage">
-              <defs><clipPath id="typeclip"><rect class="type-rect" x="138" y="34" width="58" height="16"/></clipPath></defs>
-              <rect x="112" y="8" width="96" height="186" rx="14" fill="#1f1f24" stroke="#3a3a42" stroke-width="3"/>
-              <rect x="119" y="24" width="82" height="156" rx="4" fill="#0e0e10"/>
-              <rect x="125" y="34" width="70" height="16" rx="8" fill="#2c2c33"/>
-              <circle cx="133" cy="42" r="3.5" fill="none" stroke="#a3a3ad" stroke-width="1.5"/>
-              <text x="140" y="46" clip-path="url(#typeclip)" font-size="9" fill="#f2f2f2" font-family="Nunito, sans-serif" font-weight="800">Moto's Cool</text>
+            <svg viewBox="0 0 320 200" role="img" aria-label="Le motard en panne, à côté de sa moto, regarde son téléphone, recherche Moto's Cool et appelle le garage">
+              <defs><clipPath id="typeclip"><rect class="type-rect" x="226" y="34" width="62" height="16"/></clipPath></defs>
+              <rect y="158" width="320" height="42" fill="#1c1c22"/>
+              <path d="M0 181h320" stroke="#3a3a42" stroke-width="3" stroke-dasharray="22 16"/>
+              <!-- Moto en panne -->
+              <g transform="translate(4 112) scale(.66)">
+                <use href="#s-bike" width="120" height="70"/>
+                <use href="#s-wheel" x="7" y="37" width="30" height="30"/>
+                <use href="#s-wheel" x="81" y="37" width="30" height="30"/>
+                <circle class="hz" cx="11" cy="29" r="4" fill="#ff9f1a"/>
+                <circle class="hz" cx="99" cy="29" r="4" fill="#ff9f1a"/>
+                <g class="smoke"><circle cx="56" cy="34" r="6"/><circle cx="60" cy="31" r="8"/><circle cx="53" cy="28" r="7"/></g>
+              </g>
+              <!-- Le motard regarde son téléphone -->
+              <path d="M148 101 200 16v170l-52-75z" fill="#fff" opacity=".035"/>
+              <g transform="translate(118 88)">
+                <path d="M9 42h12l1 26h-5l-2-20-2 20H8z" fill="#26262c"/>
+                <path d="M7 19h16l2 24H5z" fill="#3a3a44"/>
+                <path d="M20 22l7 10-2-12" fill="none" stroke="#3a3a44" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <g transform="rotate(14 15 10)"><circle cx="15" cy="10" r="8" fill="#e63027"/><path d="M16 7h7v5h-7z" fill="#111"/></g>
+                <rect x="23" y="12" width="7" height="11" rx="1.4" fill="#1f1f24" stroke="#6a6a74" stroke-width=".8"/>
+                <rect class="sc2-glow" x="24.2" y="13.6" width="4.6" height="7.6" fill="#9fd8ff"/>
+                <g class="sc2-voice" fill="none" stroke="#2ecc71" stroke-width="1.4" stroke-linecap="round"><path d="M33 13q3 4 0 8"/><path d="M36 10q5 7 0 14"/></g>
+              </g>
+              <!-- Écran du téléphone en grand -->
+              <rect x="200" y="12" width="104" height="176" rx="14" fill="#1f1f24" stroke="#3a3a42" stroke-width="3"/>
+              <rect x="206" y="26" width="92" height="150" rx="4" fill="#0e0e10"/>
+              <rect x="212" y="34" width="80" height="16" rx="8" fill="#2c2c33"/>
+              <circle cx="220" cy="42" r="3.5" fill="none" stroke="#a3a3ad" stroke-width="1.5"/>
+              <text x="227" y="45.5" clip-path="url(#typeclip)" font-size="8.5" fill="#f2f2f2" font-family="Nunito, sans-serif" font-weight="800">Moto's Cool</text>
               <g class="sc2-result">
-                <rect x="125" y="58" width="70" height="56" rx="6" fill="#16161a" stroke="#e63027"/>
-                <text x="131" y="74" font-size="8.5" font-weight="900" font-family="Orbitron, sans-serif" fill="#e63027">MOTO'S <tspan fill="#f2f2f2">COOL</tspan></text>
-                <text x="131" y="87" font-size="6.5" fill="#a3a3ad" font-family="Nunito, sans-serif">Garage moto · Vitry (94)</text>
-                <text x="131" y="102" font-size="7.5" fill="#f2f2f2" font-weight="800" font-family="Nunito, sans-serif">01 43 76 26 38</text>
+                <rect x="212" y="58" width="80" height="70" rx="6" fill="#16161a" stroke="#e63027"/>
+                <text x="218" y="73" font-size="8" font-weight="900" font-family="Orbitron, sans-serif" fill="#e63027">MOTO'S <tspan fill="#f2f2f2">COOL</tspan></text>
+                <text x="218" y="85" font-size="6.2" fill="#a3a3ad" font-family="Nunito, sans-serif">Garage moto · Vitry (94)</text>
+                <text x="218" y="96" font-size="6.2" fill="#a3a3ad" font-family="Nunito, sans-serif">Dépannage 75·77·91·94</text>
+                <rect x="218" y="104" width="68" height="17" rx="8.5" fill="#2ecc71"/>
+                <use href="#i-phone" x="225" y="106.5" width="12" height="12" color="#fff"/>
+                <text x="258" y="115.5" text-anchor="middle" font-size="7.5" font-weight="800" fill="#fff" font-family="Nunito, sans-serif">Appeler</text>
+                <rect x="212" y="134" width="80" height="34" rx="6" fill="#17201b"/>
+                <path d="M212 152h80M240 134v34M262 140l20 28" stroke="#2a3a30" stroke-width="2"/>
+                <path d="M252 146c0-4 6-4 6 0 0 3-3 6-3 6s-3-3-3-6z" fill="#e63027"/>
               </g>
-              <circle class="wave" cx="160" cy="142" r="14" fill="none" stroke="#2ecc71" stroke-width="2"/>
-              <g class="sc2-call">
-                <circle cx="160" cy="142" r="14" fill="#2ecc71"/>
-                <use href="#i-phone" x="152" y="134" width="16" height="16" color="#fff"/>
+              <circle class="sc2-tap" cx="256" cy="112.5" r="7" fill="#fff" opacity="0"/>
+              <g class="sc2-callscreen">
+                <rect x="206" y="26" width="92" height="150" rx="4" fill="#0e0e10"/>
+                <text x="252" y="50" text-anchor="middle" font-size="7" fill="#a3a3ad" font-family="Nunito, sans-serif">Appel en cours…</text>
+                <circle cx="252" cy="80" r="17" fill="#e63027"/>
+                <text x="252" y="84" text-anchor="middle" font-size="10" font-weight="900" fill="#fff" font-family="Orbitron, sans-serif">MC</text>
+                <text x="252" y="114" text-anchor="middle" font-size="8.5" font-weight="900" fill="#f2f2f2" font-family="Orbitron, sans-serif">MOTO'S COOL</text>
+                <text x="252" y="127" text-anchor="middle" font-size="7.5" font-weight="800" fill="#f2f2f2" font-family="Nunito, sans-serif">01 43 76 26 38</text>
+                <circle class="wave" cx="252" cy="154" r="11" fill="none" stroke="#2ecc71" stroke-width="2"/>
+                <circle cx="252" cy="154" r="11" fill="#2ecc71"/>
+                <use href="#i-phone" x="245" y="147" width="14" height="14" color="#fff"/>
               </g>
-              <text x="160" y="172" text-anchor="middle" font-size="7" fill="#a3a3ad" font-family="Nunito, sans-serif">Appel en cours…</text>
             </svg>
-            <figcaption><b>L'appel</b>Vous cherchez « Moto's Cool » sur votre téléphone et vous appelez le 01 43 76 26 38.</figcaption>
+            <figcaption><b>L'appel</b>En panne, vous cherchez «&nbsp;Moto's Cool&nbsp;» sur votre téléphone et vous nous appelez au 01 43 76 26 38.</figcaption>
           </figure>
         </li>
         <li>
@@ -2226,24 +2265,38 @@
       gsap.fromTo('#truck', { x: -120 }, { x: () => $('#road').clientWidth, ease: 'none', scrollTrigger: { trigger: '#road', start: 'top 95%', end: 'top 25%', scrub: true, invalidateOnRefresh: true } });
       gsap.to('.hero-3d', { yPercent: 22, opacity: 0.25, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
 
-      // Histoire en 4 scènes, pilotée par le défilement
+      // Histoire en 4 scènes : petites vidéos en boucle, lues seulement quand elles sont à l'écran
       const scene = (id, build) => {
-        const tl = gsap.timeline({ scrollTrigger: { trigger: id, start: 'top 85%', end: 'bottom 45%', scrub: 0.8 } });
+        const tl = gsap.timeline({ paused: true, repeat: -1, repeatDelay: 0.8 });
         build(tl, s => document.querySelector(`${id} ${s}`));
+        ScrollTrigger.create({ trigger: id, start: 'top bottom', end: 'bottom top', onToggle: st => (st.isActive ? tl.play() : tl.pause()) });
       };
-      scene('#sc1', (tl, q) => tl.from(q('.sc1-bike'), { x: -150, ease: 'power2.out' }));
+      scene('#sc1', (tl, q) => tl
+        .fromTo(q('.sc1-bike'), { x: -200 }, { x: 0, duration: 1.6, ease: 'power2.out' })
+        .fromTo(q('.smoke'), { opacity: 0 }, { opacity: 1, duration: 0.4 })
+        .to({}, { duration: 2.6 }));
       scene('#sc2', (tl, q) => tl
-        .from(q('.type-rect'), { attr: { width: 0 }, ease: 'steps(11)' })
-        .from(q('.sc2-result'), { opacity: 0, y: 14 })
-        .from(q('.sc2-call'), { scale: 0, transformOrigin: '50% 50%', ease: 'back.out(2)' }));
+        .set(q('.sc2-callscreen'), { opacity: 0 })
+        .set(q('.sc2-voice'), { opacity: 0 })
+        .fromTo(q('.type-rect'), { attr: { width: 0 } }, { attr: { width: 62 }, duration: 1.2, ease: 'steps(11)' }, 0.5)
+        .fromTo(q('.sc2-result'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4 }, '+=0.2')
+        .fromTo(q('.sc2-tap'), { opacity: 0.7, scale: 0.4, transformOrigin: '50% 50%' }, { opacity: 0, scale: 2, duration: 0.5, immediateRender: false }, '+=0.7')
+        .to(q('.sc2-callscreen'), { opacity: 1, duration: 0.3 })
+        .to(q('.sc2-voice'), { opacity: 1, duration: 0.3 }, '<')
+        .to({}, { duration: 2.4 })
+        .to([q('.sc2-callscreen'), q('.sc2-voice'), q('.sc2-result')], { opacity: 0, duration: 0.3 }));
       scene('#sc3', (tl, q) => tl
-        .from(q('.sc3-van'), { x: -230, ease: 'power2.out' })
-        .from(document.querySelectorAll('#sc3 .wh'), { rotation: -720, transformOrigin: '50% 50%', ease: 'power2.out' }, 0));
+        .fromTo(q('.sc3-van'), { x: -300 }, { x: 0, duration: 2, ease: 'power2.out' })
+        .fromTo(document.querySelectorAll('#sc3 .wh'), { rotation: -900 }, { rotation: 0, transformOrigin: '50% 50%', duration: 2, ease: 'power2.out' }, 0)
+        .to({}, { duration: 2.2 }));
       scene('#sc4', (tl, q) => tl
-        .from(q('.sc4-check'), { scale: 0, transformOrigin: '50% 50%', ease: 'back.out(2)', duration: 0.4 })
-        .to(q('.sc4-bike'), { x: 150, ease: 'power2.in' })
-        .to(document.querySelectorAll('#sc4 .wh'), { rotation: 900, transformOrigin: '50% 50%', ease: 'power2.in' }, '<')
-        .from(q('.sc4-lines'), { opacity: 0, x: 40 }, '<'));
+        .set(q('.sc4-bike'), { x: 0 })
+        .fromTo(q('.sc4-check'), { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, ease: 'back.out(2)', duration: 0.5 }, 0.4)
+        .to(q('.sc4-bike'), { x: 260, duration: 1.8, ease: 'power2.in' }, '+=0.8')
+        .fromTo(document.querySelectorAll('#sc4 .wh'), { rotation: 0 }, { rotation: 1080, transformOrigin: '50% 50%', duration: 1.8, ease: 'power2.in' }, '<')
+        .fromTo(q('.sc4-lines'), { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.6 }, '<0.6')
+        .to([q('.sc4-check'), q('.sc4-lines')], { opacity: 0, duration: 0.4 }, '+=0.6')
+        .set(q('.sc4-check'), { opacity: 1, scale: 0 }));
 
       gsap.utils.toArray('.rv').forEach(el => gsap.from(el, { y: 60, opacity: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } }));
       document.querySelectorAll('[data-count]').forEach(el => {
