@@ -975,8 +975,8 @@
       </div>
       <div class="tow-info">
         <div class="ti rv">
-          <h3>Intervention réactive</h3>
-          <p>Un appel suffit : nous évaluons la situation au téléphone et un dépanneur part de l'atelier de Vitry-sur-Seine. Le délai vous est annoncé dès l'appel, selon la commune et le trafic.</p>
+          <h3>Intervention express</h3>
+          <p>Un appel suffit : nous évaluons la situation au téléphone et un dépanneur part aussitôt de l'atelier de Vitry-sur-Seine, dans le 75, 77, 91 et 94.</p>
         </div>
         <div class="ti rv">
           <h3>Tarif selon la zone et le cas</h3>
@@ -1352,10 +1352,10 @@
     const BRANDS = ['Yamaha', 'Honda', 'Suzuki', 'Kawasaki', 'Piaggio', 'Vespa', 'Ducati', 'Moto Guzzi', 'Triumph', 'BMW'];
     // Zone de dépannage : uniquement ces 4 départements
     const ZONE = {
-      '75': { nom: 'Paris', delai: "Intervention rapide dans tout Paris, à quelques minutes de l'atelier par le périphérique.", tarif: "Tarif selon l'arrondissement et l'accès (rue, parking, sous-sol…)." },
-      '77': { nom: 'Seine-et-Marne', delai: 'Le département est vaste : le délai dépend de la commune, il vous est annoncé dès l\'appel.', tarif: 'Tarif selon la distance depuis Vitry-sur-Seine.' },
-      '91': { nom: 'Essonne', delai: "Intervention dans la journée, souvent plus vite selon la commune et le trafic.", tarif: 'Tarif selon la distance depuis Vitry-sur-Seine.' },
-      '94': { nom: 'Val-de-Marne', delai: "Notre atelier est à Vitry-sur-Seine : c'est là que nous intervenons le plus vite.", tarif: 'Tarif de proximité, le plus avantageux.' }
+      '75': { nom: 'Paris', delai: "Intervention express dans tout Paris, à quelques minutes de l'atelier par le périphérique.", tarif: "Tarif selon l'arrondissement et l'accès (rue, parking, sous-sol…)." },
+      '77': { nom: 'Seine-et-Marne', delai: "Intervention express dans toute la Seine-et-Marne : un dépanneur part dès votre appel.", tarif: 'Tarif selon la distance depuis Vitry-sur-Seine.' },
+      '91': { nom: 'Essonne', delai: "Intervention express dans toute l'Essonne : un dépanneur part dès votre appel.", tarif: 'Tarif selon la distance depuis Vitry-sur-Seine.' },
+      '94': { nom: 'Val-de-Marne', delai: "Intervention express : notre atelier est à Vitry-sur-Seine, au cœur du département.", tarif: 'Tarif de proximité, le plus avantageux.' }
     };
     // Horaires d'ouverture : [ouverture, fermeture] en minutes, index 0 = dimanche
     const HOURS = [null, [570, 1110], [570, 1110], [570, 1110], [570, 1110], [570, 1110], [600, 1110]];
