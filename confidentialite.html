@@ -9,10 +9,26 @@
   <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" href="https://motoscool.fr/confidentialite.html">
   <meta name="theme-color" content="#0a0a0c">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230a0a0c%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2720%27 fill=%27none%27 stroke=%27%23e63027%27 stroke-width=%278%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%276%27 fill=%27%23e63027%27/%3E%3C/svg%3E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="Moto's Cool">
+  <meta property="og:url" content="https://motoscool.fr/confidentialite.html">
+  <meta property="og:title" content="Politique de confidentialité et cookies – Moto's Cool">
+  <meta property="og:description" content="Politique de confidentialité de Moto's Cool : données collectées par le formulaire de rendez-vous, finalités, durées de conservation, vos droits RGPD et cookies.">
+  <meta property="og:image" content="https://motoscool.fr/assets/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Moto's Cool – Garage &amp; dépannage moto – 01 43 76 26 38">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://motoscool.fr/assets/og-image.jpg">
+  <meta name="twitter:image:alt" content="Moto's Cool – Garage &amp; dépannage moto – 01 43 76 26 38">
+  <!-- Polices auto-hébergées : aucune requête vers Google -->
+  <link rel="preload" href="assets/fonts/nunito-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
   <style>
     :root { --red: #e63027; --bg: #0e0e10; --bg-2: #16161a; --line: #2c2c33; --text: #f2f2f2; --muted: #a3a3ad; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,10 +39,10 @@
     header { border-bottom: 1px solid var(--line); }
     header .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; height: 72px; }
     .logo { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.25rem; text-decoration: none; }
-    .r { color: var(--red); }
+    .r { color: #ef4136; }
     .back { color: var(--muted); font-weight: 700; font-size: .95rem; }
     main { padding: 60px 0 80px; }
-    .kicker { font-family: 'Orbitron', sans-serif; color: var(--red); font-size: .75rem; letter-spacing: .3em; text-transform: uppercase; }
+    .kicker { font-family: 'Orbitron', sans-serif; color: #ef4136; font-size: .75rem; letter-spacing: .3em; text-transform: uppercase; }
     h1 { font-size: clamp(1.9rem, 6vw, 2.8rem); line-height: 1.15; margin: 10px 0 12px; }
     h2 { font-size: 1.3rem; margin: 40px 0 12px; padding-top: 18px; border-top: 1px solid var(--line); scroll-margin-top: 20px; }
     h3 { font-size: 1.05rem; margin: 20px 0 6px; }
@@ -70,9 +86,21 @@
       <li><b>Véhicule</b> : type (moto, scooter, quad, autre), plaque d'immatriculation, marque, modèle, cylindrée, année, kilométrage, intervention souhaitée ;</li>
       <li><b>Rendez-vous</b> : lieu (atelier ou domicile), adresse d'intervention (uniquement pour une intervention à domicile), date et heure souhaitées ;</li>
       <li><b>Contact</b> : nom, téléphone, adresse email ;</li>
-      <li><b>Message</b> libre (facultatif) : merci de n'y indiquer aucune donnée sensible.</li>
+      <li><b>Message</b> libre (facultatif) : merci de n'y indiquer aucune donnée sensible ;</li>
+      <li><b>Photos du véhicule</b> (facultatif, 3 au maximum) : elles sont réduites dans votre navigateur (1 600 pixels maximum) puis jointes à votre demande, uniquement pour préparer le diagnostic. Évitez de photographier des personnes ou des documents ;</li>
+      <li><b>Position géographique</b> (facultatif) : seulement si vous utilisez le bouton « Me localiser » pour une intervention à domicile et que vous l'autorisez dans votre navigateur. Les coordonnées (latitude, longitude et précision) sont jointes à la demande pour aider le dépanneur à vous trouver.</li>
     </ul>
     <p>Le vérificateur de zone de dépannage (code postal ou commune) n'enregistre rien : lorsque vous saisissez un nom de commune, ce texte est envoyé à l'API Adresse de l'État (api-adresse.data.gouv.fr) uniquement pour trouver le code postal correspondant.</p>
+
+    <h3 id="localisation">Bouton « Me localiser »</h3>
+    <p>La localisation n'est jamais demandée automatiquement : elle ne l'est que si vous cliquez sur « Me localiser », et votre navigateur vous demande alors votre accord. Votre position est envoyée à l'API Adresse de l'État (api-adresse.data.gouv.fr) pour retrouver l'adresse correspondante et vérifier que vous êtes dans notre zone de dépannage. Elle n'est ni conservée sur le site ni transmise à un tiers. Elle n'est enregistrée avec votre demande de rendez-vous que si vous choisissez une intervention à domicile et envoyez le formulaire. Vous pouvez refuser : la vérification par code postal fonctionne sans localisation.</p>
+
+    <h3 id="assistant">Assistant « Une question ? »</h3>
+    <p>L'assistant est un outil automatique, sans conseiller humain. Dans sa version actuelle, il répond uniquement à partir des informations du site : vos messages restent dans votre navigateur et ne sont ni envoyés ni enregistrés.</p>
+    <p>Si l'assistant fonctionne en mode IA (cela est alors indiqué dans la fenêtre de l'assistant), le texte de vos messages et des réponses précédentes de la conversation est transmis, via un serveur intermédiaire hébergé par Cloudflare, à la société Anthropic (fournisseur du modèle d'IA Claude) pour générer la réponse. Moto's Cool ne conserve pas ces conversations. <span class="todo">[À COMPLÉTER avant activation du mode IA : durée de conservation chez Anthropic et Cloudflare, lieu de traitement et garanties de transfert hors UE]</span>. N'indiquez dans l'assistant aucune donnée personnelle ou sensible : pour un rendez-vous, utilisez le formulaire.</p>
+
+    <h3 id="whatsapp">WhatsApp</h3>
+    <p>Si un bouton WhatsApp est affiché, il ouvre simplement l'application WhatsApp avec un message prérempli. Rien n'est envoyé tant que vous ne validez pas l'envoi. L'échange relève alors des conditions de WhatsApp (Meta), et Moto's Cool utilise vos messages uniquement pour vous répondre.</p>
 
     <h2>Finalités et bases légales</h2>
     <div class="table-wrap">
@@ -99,6 +127,7 @@
       <li>Le personnel habilité de Moto's Cool (accueil, techniciens, dépanneurs) ;</li>
       <li>L'éditeur du logiciel de gestion d'atelier <b>G8</b>, dans lequel la demande est enregistrée, agissant en tant que sous-traitant : <span class="todo">[À COMPLÉTER : nom, adresse de l'éditeur de G8 et lieu d'hébergement des données]</span> ;</li>
       <li>L'hébergeur du site (voir les <a href="mentions-legales.html">mentions légales</a>) ;</li>
+      <li>Uniquement si l'assistant fonctionne en mode IA : Cloudflare (serveur intermédiaire) et Anthropic (modèle d'IA), pour les seuls messages écrits dans l'assistant ;</li>
       <li>Le cas échéant, les autorités habilitées, sur réquisition légale.</li>
     </ul>
     <p>Transfert hors de l'Union européenne : aucun <span class="todo">[À VÉRIFIER auprès de l'éditeur de G8 et de l'hébergeur]</span>.</p>
@@ -113,14 +142,18 @@
 
     <h2 id="cookies">Cookies et traceurs</h2>
     <p><b>Ce site ne dépose aucun cookie publicitaire, de mesure d'audience ou de réseau social, et n'utilise aucun traceur.</b> Il n'y a donc rien à accepter ni à refuser : aucun bandeau de consentement n'est nécessaire.</p>
-    <p>Seul un stockage strictement technique peut intervenir, nécessaire au fonctionnement du site (mise en cache par votre navigateur des polices, scripts et fonds de carte). Il est exempté de consentement (article 82 de la loi Informatique et Libertés).</p>
-    <h3>Ressources externes</h3>
-    <p>Pour afficher certaines fonctions, le site charge des ressources depuis des serveurs tiers, qui reçoivent à cette occasion votre adresse IP, comme pour toute page web :</p>
+    <p>Seul un stockage strictement technique peut intervenir, nécessaire au fonctionnement du site. Il est exempté de consentement (article 82 de la loi Informatique et Libertés) :</p>
     <ul>
-      <li>Google Fonts (polices de caractères) ;</li>
+      <li>la mise en cache habituelle des fichiers par votre navigateur ;</li>
+      <li>un <b>service worker</b> (fonction « application installable ») qui enregistre dans votre navigateur les pages, polices, icônes et bibliothèques du site, pour accélérer les visites suivantes et permettre la consultation hors ligne. Il ne contient aucune donnée personnelle, aucun identifiant ni aucun cookie ; vous pouvez le supprimer depuis les paramètres de votre navigateur (« Cookies et données de site »).</li>
+    </ul>
+    <h3>Ressources externes</h3>
+    <p>Les polices de caractères sont hébergées sur le site lui-même : aucune requête n'est faite vers Google. Pour afficher certaines fonctions, le site charge des ressources depuis des serveurs tiers, qui reçoivent à cette occasion votre adresse IP, comme pour toute page web :</p>
+    <ul>
       <li>cdnjs / Cloudflare (bibliothèques GSAP, Three.js et Leaflet) ;</li>
       <li>OpenStreetMap (fonds de carte de la zone de dépannage et plan d'accès) ;</li>
-      <li>API Adresse de l'État (recherche de commune, uniquement si vous l'utilisez).</li>
+      <li>API Adresse de l'État (recherche de commune ou bouton « Me localiser », uniquement si vous les utilisez) ;</li>
+      <li>en mode IA uniquement : Cloudflare et Anthropic (assistant, voir ci-dessus).</li>
     </ul>
     <h3>Gestion des cookies</h3>
     <p>Comme aucun cookie soumis à consentement n'est utilisé, aucun réglage n'est requis sur ce site. Vous pouvez à tout moment supprimer les données stockées par votre navigateur depuis ses paramètres (rubrique « Confidentialité » ou « Cookies et données de site »).</p>
@@ -134,11 +167,16 @@
     <div class="wrap">
       <ul>
         <li><a href="index.html">Accueil</a></li>
+        <li><a href="services/depannage.html">Dépannage moto</a></li>
+        <li><a href="zones/vitry-sur-seine.html">Garage à Vitry-sur-Seine</a></li>
         <li><a href="mentions-legales.html">Mentions légales</a></li>
         <li><a href="confidentialite.html" aria-current="page">Politique de confidentialité</a></li>
         <li><a href="#cookies">Gestion des cookies</a></li>
       </ul>
     </div>
   </footer>
+  <script>
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  </script>
 </body>
 </html>

@@ -1,0 +1,19 @@
+name = "motoscool-assistant"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Origines autorisées à appeler l'assistant (séparées par des virgules)
+ALLOWED_ORIGINS = "https://motoscool.fr,https://www.motoscool.fr"
+
+# Limitation de débit : 20 messages par minute et par adresse IP
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 20
+  period = 60
+
+# La clé d'API n'est JAMAIS écrite ici : npx wrangler secret put ANTHROPIC_API_KEY

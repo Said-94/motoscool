@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+# Fichiers de travail et code du proxy de l'assistant : sans intérêt pour les moteurs de recherche
+Disallow: /_bmad/
+Disallow: /_bmad-output/
+Disallow: /ai-proxy/
 
 Sitemap: https://motoscool.fr/sitemap.xml
