@@ -74,6 +74,7 @@
   box.id = 'mc-chat';
   box.hidden = true;
   box.setAttribute('role', 'dialog');
+  box.setAttribute('data-lenis-prevent', ''); // le défilement doux (Lenis) laisse la molette au panneau
   box.setAttribute('aria-modal', 'true');
   box.setAttribute('aria-labelledby', 'mc-title');
   box.setAttribute('aria-describedby', 'mc-sub');
@@ -85,7 +86,7 @@
       </div>
       <button type="button" class="mc-x" aria-label="Fermer l'assistant">×</button>
     </div>
-    <div class="mc-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+    <div class="mc-log" data-lenis-prevent role="log" aria-live="polite" aria-relevant="additions"></div>
     <div class="mc-chips" role="group" aria-label="Questions fréquentes"></div>
     <p class="mc-note">${AI
       ? "Vos messages sont transmis à un fournisseur d'IA pour générer la réponse. N'y indiquez aucune donnée sensible. <a href=\"confidentialite.html#assistant\" style=\"color:inherit\">En savoir plus</a>"

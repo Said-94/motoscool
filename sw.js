@@ -1,24 +1,25 @@
 /*
  * Service worker de Moto's Cool : visites suivantes plus rapides et consultation hors ligne.
  * - Pages HTML : réseau d'abord, puis cache, puis page « hors ligne ».
- * - Fichiers du site (polices, icônes, styles, scripts, images) : cache d'abord.
- * - Bibliothèques cdnjs (GSAP, Three.js, Leaflet) : mises en cache seulement si la réponse est
+ * - Fichiers du site (polices, icônes, styles, scripts, images, modèles 3D .glb) : cache d'abord.
+ *   Les .glb ne sont pas préchargés : ils sont mis en cache à la première visite qui les demande.
+ * - Bibliothèques cdnjs et jsdelivr (GSAP, Leaflet, Three.js, Lenis) : mises en cache seulement si la réponse est
  *   lisible (CORS, jamais « opaque ») et dans un cache limité en nombre d'entrées.
  * - API Adresse, fonds de carte OpenStreetMap, proxy de l'assistant IA : jamais mis en cache.
  * Changer VERSION à chaque mise en ligne pour renouveler le cache.
  */
-const VERSION = 'v2-2026-11-01';
+const VERSION = 'v3-2026-11-01';
 const STATIC = `mc-static-${VERSION}`;
 const PAGES = `mc-pages-${VERSION}`;
 const CDN = `mc-cdn-${VERSION}`;
-const CDN_MAX = 8;
+const CDN_MAX = 24;
 
 const ZONES = ['vitry-sur-seine', 'ivry-sur-seine', 'villejuif', 'creteil', 'choisy-le-roi', 'maisons-alfort', 'paris', 'evry-courcouronnes', 'massy', 'melun'];
 const SERVICES = ['entretien', 'reparation', 'depannage', 'freinage-pneus', 'scooters'];
 const PRECACHE_PAGES = ['./', 'index.html', 'mentions-legales.html', 'confidentialite.html',
   ...ZONES.map(z => `zones/${z}.html`), ...SERVICES.map(s => `services/${s}.html`)];
 const PRECACHE_STATIC = [
-  'manifest.webmanifest', 'assets/pages.css', 'assets/fonts/fonts.css', 'assets/assistant.js',
+  'manifest.webmanifest', 'assets/pages.css', 'assets/fonts/fonts.css', 'assets/assistant.js', 'assets/site-bike.js',
   'assets/icons/favicon.svg', 'assets/icons/icon-192.png', 'assets/icons/icon-512.png', 'assets/icons/apple-touch-icon.png',
   ...['orbitron-latin-600', 'orbitron-latin-800', 'orbitron-latin-900', 'nunito-latin-400', 'nunito-latin-600', 'nunito-latin-800',
     'nunito-latin-ext-400', 'nunito-latin-ext-600', 'nunito-latin-ext-800'].map(f => `assets/fonts/${f}-normal.woff2`)
@@ -69,15 +70,16 @@ async function networkFirstPage(req) {
   }
 }
 
-async function cacheFirst(req, cacheName, max) {
+async function cacheFirst(req, cacheName, max, event) {
   const c = await caches.open(cacheName);
   const hit = await c.match(req);
   if (hit) return hit;
   const res = await fetch(req);
-  // Jamais de réponse opaque (taille inconnue, quota gonflé) : uniquement des réponses lisibles
+  // Jamais de réponse opaque (taille inconnue, quota gonflé) : uniquement des réponses lisibles.
+  // La réponse part tout de suite ; la copie est mise en cache en arrière-plan (gros modèles .glb).
   if (res.ok && (res.type === 'basic' || res.type === 'cors')) {
-    await c.put(req, res.clone());
-    if (max) trim(cacheName, max);
+    const job = c.put(req, res.clone()).then(() => (max ? trim(cacheName, max) : null)).catch(() => {});
+    if (event) event.waitUntil(job);
   }
   return res;
 }
@@ -90,13 +92,13 @@ self.addEventListener('fetch', event => {
   if (url.origin === self.location.origin) {
     if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
       event.respondWith(networkFirstPage(req));
-    } else if (/\.(woff2|png|jpg|jpeg|webp|svg|css|js|webmanifest|geojson)$/.test(url.pathname) && !url.pathname.endsWith('/sw.js')) {
-      event.respondWith(cacheFirst(req, STATIC));
+    } else if (/\.(woff2|png|jpg|jpeg|webp|svg|css|js|webmanifest|geojson|glb)$/.test(url.pathname) && !url.pathname.endsWith('/sw.js')) {
+      event.respondWith(cacheFirst(req, STATIC, 0, event));
     }
     return;
   }
-  if (url.hostname === 'cdnjs.cloudflare.com') {
-    event.respondWith(cacheFirst(req, CDN, CDN_MAX).catch(() => Response.error()));
+  if (url.hostname === 'cdnjs.cloudflare.com' || url.hostname === 'cdn.jsdelivr.net') {
+    event.respondWith(cacheFirst(req, CDN, CDN_MAX, event).catch(() => Response.error()));
   }
   // Autres origines (api-adresse.data.gouv.fr, tile.openstreetmap.org, proxy IA…) : pas d'interception
 });

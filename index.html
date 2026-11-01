@@ -33,6 +33,14 @@
   <meta name="twitter:image:alt" content="Moto's Cool – Garage &amp; dépannage moto – 01 43 76 26 38">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <!-- three.js (module ES) : résolu ici, mais téléchargé seulement à la demande par assets/bike3d.js -->
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
   <!-- Polices auto-hébergées (assets/fonts) : aucune requête vers Google -->
   <link rel="preload" href="assets/fonts/orbitron-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/nunito-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -215,7 +223,19 @@
     .hero-3d { position: absolute; inset: 0; pointer-events: none; }
     #bike3d { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 1.4s ease; }
     #bike3d.ready { opacity: 1; }
+    /* Voile à gauche : la moto reste un décor, le titre et les boutons dominent */
+    .hero::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(10,10,12,.92) 0%, rgba(10,10,12,.7) 32%, rgba(10,10,12,0) 62%); }
+    #trails { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
     .hero .wrap { position: relative; z-index: 2; width: 100%; }
+    /* Sélecteur de teinte « Ta moto » : petit, discret */
+    .paint { display: inline-flex; align-items: center; gap: 12px; margin-top: 26px; padding: 8px 14px; border-radius: 999px; background: rgba(14,14,16,.6); border: 1px solid var(--line); backdrop-filter: blur(6px); font-size: .8rem; }
+    .paint-title { font-family: 'Orbitron', sans-serif; font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+    .paint-row { display: flex; gap: 8px; }
+    .sw { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,.18); background: var(--c); cursor: pointer; padding: 0; transition: transform .2s, border-color .2s; }
+    .sw:hover { transform: scale(1.12); }
+    .sw[aria-pressed="true"] { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,.12); }
+    .paint-name { color: var(--muted); font-weight: 700; min-width: 9.5em; }
+    @media (min-width: 961px) { .paint { position: absolute; right: 20px; bottom: 6px; margin: 0; } }
     .status {
       display: inline-flex; align-items: center; gap: 8px; background: rgba(31,31,36,.8); border: 1px solid var(--line);
       padding: 6px 14px; border-radius: 999px; font-size: .85rem; font-weight: 700; margin-bottom: 26px;
@@ -241,13 +261,35 @@
     .manifesto p { font-size: clamp(1.8rem, 5.2vw, 4.2rem); font-weight: 800; line-height: 1.15; max-width: 1150px; }
     .manifesto .w.red { color: var(--red); }
 
-    /* Services en défilement horizontal */
-    .hs { padding: 0; overflow: hidden; }
-    .hs-head { padding: 110px 0 44px; }
-    .hs-track { display: flex; gap: 24px; padding: 0 20px 110px; overflow-x: auto; }
-    .hs.pinned .hs-track { overflow: visible; padding-left: max(20px, calc((100vw - var(--max)) / 2 + 20px)); }
+    /* Services : visite de la moto (cartes au premier plan, 3D en fond sur ordinateur) ; sinon simple liste */
+    .tour { padding: 0; background: radial-gradient(ellipse at 38% 55%, rgba(230,48,39,.12), transparent 60%), var(--bg-0); }
+    .tour-head { padding: 110px 20px 44px; }
+    .tour-stage { position: relative; }
+    .tour-3d { display: none; }
+    .tour-steps { list-style: none; max-width: var(--max); margin: 0 auto; padding: 0 20px 110px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 24px; }
+    .tour-step { display: grid; gap: 16px; align-content: start; }
+    .tour-tag { font-family: 'Orbitron', sans-serif; font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; color: var(--red-text); }
+    .tour-intro { color: var(--muted); font-size: 1.05rem; }
+    .tour-intro b { color: var(--text); display: block; font-size: 1.3rem; margin-bottom: 6px; }
+    .tour-dots { display: none; }
+    .tour.on .tour-stage { height: 100vh; overflow: hidden; }
+    .tour.on .tour-3d { display: block; position: absolute; inset: 0; }
+    .tour.on .tour-3d canvas { display: block; width: 100%; height: 100%; }
+    .tour.on .tour-stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(270deg, rgba(10,10,12,.85) 0%, rgba(10,10,12,.35) 38%, rgba(10,10,12,0) 60%); }
+    .tour.on .tour-steps { position: absolute; z-index: 2; top: 0; bottom: 0; right: max(20px, calc((100vw - var(--max)) / 2 + 20px)); width: min(460px, 40vw); margin: 0; padding: 0; display: block; }
+    .tour.on .tour-step { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-46%); opacity: 0; pointer-events: none; transition: opacity .5s ease, transform .5s ease; }
+    .tour.on .tour-step.active { opacity: 1; transform: translateY(-50%); pointer-events: auto; }
+    .tour.on .tour-step .hpanel { min-height: 0; padding: 30px; }
+    .tour.on .tour-step .hpanel .num { font-size: 5rem; }
+    .tour.on .tour-step .hpanel .ico { display: none; }
+    .tour.on .tour-tag { justify-self: start; padding: 6px 12px; border-radius: 8px; background: rgba(10,10,12,.72); backdrop-filter: blur(6px); }
+    .tour.on .tour-dots { display: flex; flex-direction: column; gap: 10px; position: absolute; z-index: 2; left: max(20px, calc((100vw - var(--max)) / 2 + 20px)); bottom: 40px; list-style: none; font-size: .72rem; color: var(--muted); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 14px 18px; border-radius: 14px; background: rgba(10,10,12,.62); backdrop-filter: blur(6px); }
+    .tour-dots li { display: flex; align-items: center; gap: 10px; opacity: .5; transition: opacity .3s, color .3s; }
+    .tour-dots li::before { content: ""; width: 18px; height: 2px; background: currentColor; transition: width .3s; }
+    .tour-dots li.on { opacity: 1; color: var(--text); }
+    .tour-dots li.on::before { width: 36px; background: var(--red); }
     .hpanel {
-      flex: 0 0 min(80vw, 500px); min-height: 440px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 26px;
+      min-height: 400px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 26px;
       padding: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end;
     }
     .hpanel::before {
@@ -279,10 +321,16 @@
     /* Textes décoratifs (aria-hidden) rendus en pseudo-élément */
     .bigm .l2::before, .giant::before { content: attr(data-text); }
 
-    /* Chiffres */
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
-    .stat b { font-family: 'Orbitron', sans-serif; font-size: clamp(2.6rem, 6vw, 4.5rem); color: var(--red); display: block; line-height: 1.1; }
-    .stat span { color: var(--muted); }
+    /* Chiffres géants (liste simple ; séquence épinglée courte sur ordinateur) */
+    .figs-list { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 50px 30px; text-align: center; }
+    .fig b { display: block; font-family: 'Orbitron', sans-serif; font-weight: 900; color: var(--red); line-height: 1; font-size: clamp(4rem, 13vw, 9rem); letter-spacing: -.02em; }
+    .fig .lbl { display: block; margin-top: 10px; color: var(--muted); font-weight: 800; font-size: clamp(1rem, 2vw, 1.4rem); }
+    .fig .idx { display: block; font-family: 'Orbitron', sans-serif; font-size: .7rem; letter-spacing: .3em; color: var(--muted); margin-bottom: 10px; }
+    .figs.on { padding: 0; }
+    .figs.on .figs-stage { position: relative; height: 100vh; }
+    .figs.on .figs-list { display: block; position: absolute; inset: 0; }
+    .figs.on .fig { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; }
+    .figs.on .fig b { font-size: min(calc(80vw / var(--n, 2)), 52vh, 20rem); }
 
     /* Onglets des prestations */
     .prestations { background: var(--bg-2); }
@@ -384,6 +432,35 @@
     .badge.no::before { content: "✕"; color: var(--red); }
     .badge.no s { text-decoration-color: var(--red); text-decoration-thickness: 2px; }
 
+    /* « Ta moto en une phrase » : une saisie, une marque, un bouton */
+    .one { margin-bottom: 60px; padding: 30px; border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(135deg, rgba(230,48,39,.08), transparent 55%), var(--bg-2); }
+    .one-label { display: block; font-family: 'Orbitron', sans-serif; font-size: .78rem; letter-spacing: .25em; text-transform: uppercase; color: var(--red-text); margin-bottom: 10px; }
+    .one-input { font-size: clamp(1.25rem, 3vw, 1.9rem); font-weight: 800; background: transparent; border: 0; border-bottom: 2px solid var(--line); border-radius: 0; padding: 10px 0; }
+    .one-input:focus { border-color: var(--red); }
+    .one-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 18px; }
+    .one .hint { margin-top: 10px; display: block; }
+    .lb { position: relative; }
+    .lb-btn { display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 190px; padding: 13px 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-weight: 800; cursor: pointer; }
+    .lb-btn:hover, .lb-btn[aria-expanded="true"] { border-color: var(--red); }
+    .lb-btn::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); }
+    .lb-btn.empty { color: var(--muted); }
+    .lb-list { position: absolute; z-index: 20; top: calc(100% + 8px); left: 0; width: min(420px, calc(100vw - 40px)); list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 10px; background: var(--bg-3); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 60px -20px rgba(0,0,0,.9); }
+    .lb-list li { padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+    .lb-list li:hover, .lb-list li.focus { background: rgba(230,48,39,.18); }
+    .lb-list li[aria-selected="true"] { background: var(--red-ui); color: #fff; }
+    .lb-list:focus { outline: none; }
+    .lb-list:focus-visible li.focus { outline: 2px solid var(--cyan); outline-offset: -2px; }
+
+    /* Titres révélés mot par mot (masque) */
+    .mw { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em; }
+    .mw > i { display: inline-block; font-style: normal; }
+
+    /* Défilement doux (Lenis, ordinateur uniquement) */
+    html.lenis, html.lenis body { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
+    .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+    .lenis.lenis-stopped { overflow: hidden; }
+
     /* Rendez-vous */
     .quote { background: var(--bg); }
     .quote-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 50px; align-items: start; }
@@ -391,7 +468,7 @@
     .steps li { display: flex; gap: 16px; align-items: flex-start; }
     .steps .n { font-family: 'Orbitron', sans-serif; font-weight: 900; color: #fff; background: var(--red-ui); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
     .steps p { color: var(--muted); }
-    #quote-form { background: var(--bg-2); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: grid; gap: 16px; }
+    #quote-form { scroll-margin-top: 90px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: grid; gap: 16px; }
     #quote-form fieldset { border: 0; display: grid; gap: 14px; min-width: 0; }
     #quote-form legend { font-family: 'Orbitron', sans-serif; font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; color: var(--red-text); margin-bottom: 4px; padding: 0; }
     .sep { border: 0; border-top: 1px solid var(--line); }
@@ -444,6 +521,7 @@
     .faq-list details p { padding: 0 24px 22px; color: var(--muted); animation: fadeUp .4s ease; }
 
     /* Contact */
+    #contact { overflow-x: clip; } /* le grand titre décoratif du pied de page ne crée pas de défilement horizontal */
     .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; margin-top: 44px; }
     .info { background: var(--bg-2); border: 1px solid var(--line); border-radius: 20px; padding: 34px; }
     .info .logo { font-size: 1.6rem; margin-bottom: 20px; }
@@ -572,15 +650,20 @@
     }
     @media (max-width: 960px) {
       .tow-grid, .quote-grid, .contact-grid, .tow-info, .tarif-grid { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 34px 20px; }
       .hero-3d { opacity: .4; }
       .zone-map { height: 360px; }
     }
     @media (max-width: 760px) {
       section { padding: 80px 0; }
-      .hs-head { padding: 80px 0 34px; }
-      .hs-track { flex-direction: column; overflow: visible; padding-bottom: 80px; }
-      .hpanel { flex: none; min-height: 360px; padding: 30px; }
+      .tour-head { padding: 80px 20px 34px; }
+      .tour-steps { padding-bottom: 80px; }
+      .hpanel { min-height: 0; padding: 30px; }
+      .figs-list { grid-template-columns: 1fr; gap: 44px; }
+      .one { padding: 22px 18px; margin-bottom: 44px; }
+      .one-row > * { flex: 1 1 100%; }
+      .lb-btn { width: 100%; }
+      .one-row .btn { justify-content: center; }
+      .paint { flex-wrap: wrap; border-radius: 18px; }
       .hpanel .num { font-size: 6rem; }
       .panel { grid-template-columns: 1fr; padding: 24px; }
       .panel ul, .row { grid-template-columns: 1fr; }
@@ -612,7 +695,9 @@
       .sos-call { background: var(--red-ui); color: #fff; }
       .sos-rdv { border: 2px solid var(--line); color: var(--text); }
       .to-top { bottom: calc(84px + env(safe-area-inset-bottom)); }
-      .chat-btn { bottom: calc(146px + env(safe-area-inset-bottom)); width: 52px; padding: 0; justify-content: center; }
+      /* Assistant : plus petit, au-dessus de la barre fixe et du bouton « haut », masqué tant que l'accueil est à l'écran */
+      .chat-btn { bottom: calc(146px + env(safe-area-inset-bottom)); width: 46px; height: 46px; padding: 0; justify-content: center; opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity .3s, visibility .3s, transform .3s; }
+      .past-hero .chat-btn { opacity: 1; visibility: visible; transform: none; }
       .chat-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
       .wa { bottom: calc(208px + env(safe-area-inset-bottom)); }
     }
@@ -712,6 +797,7 @@
   <!-- ACCUEIL -->
   <section class="hero" id="accueil" aria-label="Accueil">
     <div class="hero-3d" aria-hidden="true"><canvas id="bike3d"></canvas></div>
+    <canvas id="trails" aria-hidden="true"></canvas>
     <div class="wrap">
       <div class="status fade" id="status"><span class="dot"></span><span id="status-txt">Horaires</span></div>
       <h1>
@@ -724,6 +810,18 @@
       <div class="hero-cta fade">
         <a href="tel:+33143762638" class="btn btn-red"><svg aria-hidden="true"><use href="#i-phone"/></svg>Appeler maintenant</a>
         <a href="#devis" class="btn btn-ghost">Prendre rendez-vous</a>
+      </div>
+      <!-- Teinte de la moto 3D : affiché seulement quand la 3D est chargée -->
+      <div class="paint" id="paint" role="group" aria-labelledby="paint-title" hidden>
+        <span class="paint-title" id="paint-title">Ta moto</span>
+        <span class="paint-row">
+          <button type="button" class="sw" data-paint="noir" aria-pressed="true" style="--c:#262626"><span class="sr-only">Noir carbone</span></button>
+          <button type="button" class="sw" data-paint="rouge" aria-pressed="false" style="--c:#c8161d"><span class="sr-only">Rouge</span></button>
+          <button type="button" class="sw" data-paint="blanc" aria-pressed="false" style="--c:#efece5"><span class="sr-only">Blanc nacré</span></button>
+          <button type="button" class="sw" data-paint="titane" aria-pressed="false" style="--c:#8a8d93"><span class="sr-only">Gris titane</span></button>
+          <button type="button" class="sw" data-paint="bleu" aria-pressed="false" style="--c:#17264f"><span class="sr-only">Bleu nuit</span></button>
+        </span>
+        <span class="paint-name" id="paint-name" aria-live="polite">Noir carbone</span>
       </div>
     </div>
     <div class="scroll-hint" aria-hidden="true">Scroll<i></i></div>
@@ -738,19 +836,45 @@
     </div>
   </section>
 
-  <!-- SERVICES (DÉFILEMENT HORIZONTAL) -->
-  <section class="hs" id="services" aria-labelledby="services-title">
-    <div class="wrap hs-head">
+  <!-- SERVICES : VISITE DE LA MOTO
+       Sans 3D (mobile, mouvement réduit, WebGL ou JavaScript indisponible) : simple liste de cartes.
+       Sur ordinateur, une fois la 3D prête : section épinglée courte, la caméra passe d'une pièce à l'autre derrière les cartes. -->
+  <section class="tour" id="services" aria-labelledby="services-title">
+    <div class="wrap tour-head">
       <span class="kicker rv">Nos services</span>
       <h2 class="rv" id="services-title">Tout pour votre deux-roues.</h2>
     </div>
-    <div class="hs-track" id="hs-track">
-      <article class="hpanel"><span class="num" aria-hidden="true">01</span><div class="ico"><svg aria-hidden="true"><use href="#i-gear"/></svg></div><h3>Entretien &amp; révision</h3><p>Vidange, filtres, kit chaîne, contrôle complet selon le carnet constructeur.</p><a href="#devis" class="btn btn-red" data-presta="Entretien">Réserver</a></article>
-      <article class="hpanel"><span class="num" aria-hidden="true">02</span><div class="ico"><svg aria-hidden="true"><use href="#i-wrench"/></svg></div><h3>Réparation mécanique</h3><p>Moteur, embrayage, transmission, électricité : nous remettons votre moto en état.</p><a href="#devis" class="btn btn-red" data-presta="Réparation">Réserver</a></article>
-      <article class="hpanel hl"><span class="num" aria-hidden="true">03</span><div class="ico"><svg aria-hidden="true"><use href="#i-truck"/></svg></div><h3>Dépannage 75·77·91·94</h3><p>Des véhicules équipés pour un dépannage rapide à Paris, en Seine-et-Marne, dans l'Essonne et le Val-de-Marne.</p><a href="tel:+33143762638" class="btn">Appeler</a></article>
-      <article class="hpanel"><span class="num" aria-hidden="true">04</span><div class="ico"><svg aria-hidden="true"><use href="#i-shield"/></svg></div><h3>Diagnostic</h3><p>Recherche de panne sur place : le prix de la réparation est fixé après ce diagnostic.</p><a href="#devis" class="btn btn-red" data-presta="Diagnostic">Réserver</a></article>
-      <article class="hpanel"><span class="num" aria-hidden="true">05</span><div class="ico"><svg aria-hidden="true"><use href="#i-check"/></svg></div><h3>Freinage &amp; pneus</h3><p>Plaquettes, disques, purge, pneus et équilibrage : votre sécurité avant tout.</p><a href="#devis" class="btn btn-red" data-presta="Freinage">Réserver</a></article>
-      <article class="hpanel"><span class="num" aria-hidden="true">06</span><div class="ico"><svg aria-hidden="true"><use href="#i-gear"/></svg></div><h3>Scooters</h3><p>Piaggio, Vespa et scooters de toutes cylindrées, entretenus avec le même soin.</p><a href="#devis" class="btn btn-red" data-presta="Entretien">Réserver</a></article>
+    <div class="tour-stage" id="tour-stage">
+      <div class="tour-3d" aria-hidden="true"><canvas id="tour3d"></canvas></div>
+      <ol class="tour-dots" aria-hidden="true">
+        <li class="on">Vue d'ensemble</li><li>Freins &amp; roues</li><li>Moteur</li><li>Chaîne</li><li>Électronique</li><li>Assistance</li>
+      </ol>
+      <div class="tour-steps" id="tour-steps">
+        <div class="tour-step active" data-stop="0">
+          <p class="tour-intro"><b>De la roue avant au feu arrière.</b>Chaque pièce de votre moto a son service à l'atelier de Vitry-sur-Seine.</p>
+        </div>
+        <div class="tour-step" data-stop="1">
+          <span class="tour-tag">Roue avant · freins</span>
+          <article class="hpanel"><span class="num" aria-hidden="true">01</span><div class="ico"><svg aria-hidden="true"><use href="#i-check"/></svg></div><h3>Freinage &amp; pneus</h3><p>Plaquettes, disques, purge, pneus et équilibrage : votre sécurité avant tout.</p><a href="#devis" class="btn btn-red" data-presta="Freinage">Réserver</a></article>
+        </div>
+        <div class="tour-step" data-stop="2">
+          <span class="tour-tag">Moteur</span>
+          <article class="hpanel"><span class="num" aria-hidden="true">02</span><div class="ico"><svg aria-hidden="true"><use href="#i-wrench"/></svg></div><h3>Réparation mécanique</h3><p>Moteur, embrayage, transmission, électricité : nous remettons votre moto en état.</p><a href="#devis" class="btn btn-red" data-presta="Réparation">Réserver</a></article>
+        </div>
+        <div class="tour-step" data-stop="3">
+          <span class="tour-tag">Chaîne · transmission</span>
+          <article class="hpanel"><span class="num" aria-hidden="true">03</span><div class="ico"><svg aria-hidden="true"><use href="#i-gear"/></svg></div><h3>Entretien &amp; révision</h3><p>Vidange, filtres, kit chaîne, contrôle complet selon le carnet constructeur.</p><a href="#devis" class="btn btn-red" data-presta="Entretien">Réserver</a></article>
+        </div>
+        <div class="tour-step" data-stop="4">
+          <span class="tour-tag">Électronique · éclairage</span>
+          <article class="hpanel"><span class="num" aria-hidden="true">04</span><div class="ico"><svg aria-hidden="true"><use href="#i-shield"/></svg></div><h3>Diagnostic</h3><p>Recherche de panne sur place : le prix de la réparation est fixé après ce diagnostic.</p><a href="#devis" class="btn btn-red" data-presta="Diagnostic">Réserver</a></article>
+        </div>
+        <div class="tour-step" data-stop="5">
+          <span class="tour-tag">Sur la route · scooters</span>
+          <article class="hpanel hl"><span class="num" aria-hidden="true">05</span><div class="ico"><svg aria-hidden="true"><use href="#i-truck"/></svg></div><h3>Dépannage 75·77·91·94</h3><p>Des véhicules équipés pour un dépannage rapide à Paris, en Seine-et-Marne, dans l'Essonne et le Val-de-Marne.</p><a href="tel:+33143762638" class="btn">Appeler</a></article>
+          <article class="hpanel"><span class="num" aria-hidden="true">06</span><div class="ico"><svg aria-hidden="true"><use href="#i-gear"/></svg></div><h3>Scooters</h3><p>Piaggio, Vespa et scooters de toutes cylindrées, entretenus avec le même soin.</p><a href="#devis" class="btn btn-red" data-presta="Entretien">Réserver</a></article>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -761,13 +885,15 @@
   </div>
 
   <!-- CHIFFRES -->
-  <section class="has-fx" aria-label="Moto's Cool en chiffres">
+  <section class="figs has-fx" id="chiffres" aria-label="Moto's Cool en chiffres">
     <div class="fx fx-gear" aria-hidden="true"><svg viewBox="0 0 220 220" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M194.8 95.4L209.5 99.5L209.5 120.5L194.8 124.6L190.7 139.8L201.4 150.7L190.9 168.8L176.1 165.0L165.0 176.1L168.8 190.9L150.7 201.4L139.8 190.7L124.6 194.8L120.5 209.5L99.5 209.5L95.4 194.8L80.2 190.7L69.3 201.4L51.2 190.9L55.0 176.1L43.9 165.0L29.1 168.8L18.6 150.7L29.3 139.8L25.2 124.6L10.5 120.5L10.5 99.5L25.2 95.4L29.3 80.2L18.6 69.3L29.1 51.2L43.9 55.0L55.0 43.9L51.2 29.1L69.3 18.6L80.2 29.3L95.4 25.2L99.5 10.5L120.5 10.5L124.6 25.2L139.8 29.3L150.7 18.6L168.8 29.1L165.0 43.9L176.1 55.0L190.9 51.2L201.4 69.3L190.7 80.2Z"/><circle cx="110" cy="110" r="58"/><circle cx="110" cy="110" r="22"/><path d="M110 52v36M110 132v36M52 110h36M132 110h36"/></svg></div>
-    <div class="wrap stats-grid">
-      <div class="stat rv"><b data-count="10">10</b><span>marques entretenues</span></div>
-      <div class="stat rv"><b data-count="4">4</b><span>départements dépannés</span></div>
-      <div class="stat rv"><b data-count="6">6</b><span>jours sur 7 à l'atelier</span></div>
-      <div class="stat rv"><b><span data-count="100">100</span>%</b><span>techniciens diplômés</span></div>
+    <div class="figs-stage" id="figs-stage">
+      <ul class="wrap figs-list">
+        <li class="fig" style="--n:1"><span class="idx" aria-hidden="true">01 / 04</span><b data-count="4">4</b><span class="lbl">départements dépannés : 75, 77, 91 et 94</span></li>
+        <li class="fig" style="--n:1"><span class="idx" aria-hidden="true">02 / 04</span><b data-count="6">6</b><span class="lbl">jours sur 7 à l'atelier</span></li>
+        <li class="fig" style="--n:2"><span class="idx" aria-hidden="true">03 / 04</span><b data-count="10">10</b><span class="lbl">marques entretenues</span></li>
+        <li class="fig" style="--n:4.2"><span class="idx" aria-hidden="true">04 / 04</span><b><span data-count="100">100</span>&nbsp;%</b><span class="lbl">techniciens diplômés</span></li>
+      </ul>
     </div>
   </section>
 
@@ -950,7 +1076,7 @@
           <div class="tow-msg rv" id="tow-msg" aria-live="polite">Touchez un département ou saisissez votre code postal pour vérifier notre zone d'intervention.</div>
         </div>
         <div class="rv">
-          <div id="map" class="zone-map" role="region" aria-label="Carte de la zone de dépannage : Paris, Seine-et-Marne, Essonne et Val-de-Marne">
+          <div id="map" class="zone-map" data-lenis-prevent role="region" aria-label="Carte de la zone de dépannage : Paris, Seine-et-Marne, Essonne et Val-de-Marne">
             <p class="map-fallback">Chargement de la carte…</p>
           </div>
           <p class="map-note" id="map-note"></p>
@@ -1039,6 +1165,22 @@
 
   <!-- RENDEZ-VOUS -->
   <section class="quote" id="devis" aria-labelledby="devis-title">
+    <!-- Raccourci : une phrase + la marque préremplissent le formulaire ci-dessous (qui reste utilisable seul) -->
+    <div class="wrap">
+      <form class="one rv" id="one-form" novalidate aria-describedby="one-hint">
+        <label class="one-label" for="one-q">Ta moto en une phrase</label>
+        <input class="one-input" id="one-q" maxlength="300" autocomplete="off" placeholder="Ex : mes freins grincent depuis une semaine">
+        <div class="one-row">
+          <div class="lb">
+            <span class="sr-only" id="one-brand-label">Marque de la moto</span>
+            <button type="button" class="lb-btn empty" id="one-brand" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="one-brand-label one-brand">Marque</button>
+            <ul class="lb-list" id="one-list" role="listbox" tabindex="-1" aria-labelledby="one-brand-label" hidden></ul>
+          </div>
+          <button type="submit" class="btn btn-red">Continuer</button>
+        </div>
+        <span class="hint ko" id="one-hint" aria-live="polite"></span>
+      </form>
+    </div>
     <div class="wrap quote-grid">
       <div>
         <span class="kicker rv">Devis &amp; rendez-vous</span>
@@ -1252,9 +1394,10 @@
     <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 4l-8 8h5v8h6v-8h5z"/></svg>
   </button>
 
-  <!-- GSAP (différé). Three.js et Leaflet sont chargés à la demande, plus bas. -->
+  <!-- GSAP (différé). Three.js (moto 3D), Lenis et Leaflet sont chargés à la demande, plus bas. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer crossorigin="anonymous"></script>
+  <script src="assets/site-bike.js"></script>
   <script>
     /**
      * POINT D'INTÉGRATION — à brancher sur le logiciel G8.
@@ -1292,7 +1435,11 @@
     //     alt: 'Kit chaîne usé puis neuf sur une Yamaha MT-07' }
     gallery: [],
     // Assistant : adresse du proxy IA (voir ai-proxy/README.md). Vide = assistant intégré, sans IA ni envoi de données.
-    aiEndpoint: ''
+    aiEndpoint: '',
+    // Moto 3D : bikeModel, bikeRotationY, bikePaintMaterials et bikeCredit se règlent dans assets/site-bike.js
+    // (fichier partagé avec les mentions légales). bikeModel vide = moto procédurale, aucune requête de modèle.
+    bikeModel: '', bikeRotationY: 0, bikePaintMaterials: ['paint'], bikeCredit: null,
+    ...(window.SITE_BIKE || {})
   };
   document.addEventListener('DOMContentLoaded', () => {
     const $ = s => document.querySelector(s);
@@ -1303,7 +1450,6 @@
     // Chargement à la demande d'un script / d'une feuille de style externe
     const load = src => new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; if (/^https:/.test(src)) s.crossOrigin = 'anonymous'; s.onload = ok; s.onerror = ko; document.head.append(s); });
     const loadCss = href => new Promise((ok, ko) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.crossOrigin = 'anonymous'; l.href = href; l.onload = ok; l.onerror = ko; document.head.append(l); });
-    const THREE_JS = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
     const LEAFLET_JS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
     const LEAFLET_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
 
@@ -1323,17 +1469,12 @@
     // Horaires d'ouverture : [ouverture, fermeture] en minutes, index 0 = dimanche
     const HOURS = [null, [570, 1110], [570, 1110], [570, 1110], [570, 1110], [570, 1110], [600, 1110]];
 
-    let boost = 0;        // accélération de la roue arrière 3D (envoi du formulaire)
-    let scrollSpeed = 0;  // vitesse de défilement lissée
+    let scrollSpeed = 0;  // vitesse de défilement lissée (compteur et roues de la moto 3D)
 
-    // ---------- Titre lettre par lettre ----------
+    // ---------- Titre : lettres isolées (cibles des traînées lumineuses). Le texte est visible dès le premier affichage. ----------
     document.querySelectorAll('.split').forEach(el => {
       el.innerHTML = [...el.textContent].map(c => `<span class="ch">${c}</span>`).join('');
     });
-    if (hasG && !reduce) {
-      gsap.from('.hero .ch', { yPercent: 115, rotate: 8, opacity: 0, stagger: 0.05, duration: 1.1, ease: 'power4.out' });
-      gsap.from('.hero .fade', { y: 30, opacity: 0, stagger: 0.12, delay: 0.45, duration: 0.9, ease: 'power3.out' });
-    }
     $('#hud').classList.add('on');
 
     // Mots qui défilent
@@ -1345,312 +1486,153 @@
       setTimeout(() => { w = (w + 1) % WORDS.length; rotator.textContent = WORDS[w]; rotator.classList.remove('out'); }, 350);
     }, 2800);
 
-    // ---------- Arrière de moto 3D (Three.js, chargé après le premier affichage) ----------
-    function initBike() {
-      const T = THREE, canvas = $('#bike3d');
-      const renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
-      const scene = new T.Scene();
-      const camera = new T.PerspectiveCamera(32, 1, 0.1, 100);
-      camera.position.set(0, 1.1, 15);
-      camera.lookAt(0, 0.4, 0);
-
-      // Environnement de reflets (studio sombre avec panneaux lumineux)
-      const pm = new T.PMREMGenerator(renderer);
-      const env = new T.Scene();
-      env.add(new T.Mesh(new T.BoxGeometry(30, 30, 30), new T.MeshBasicMaterial({ color: 0x1b1b20, side: T.BackSide })));
-      [[0xffffff, [-7, 8, 7], [10, 3]], [0xff3322, [9, 2, -5], [4, 8]], [0x99aabb, [0, -10, 0], [14, 14]], [0xffffff, [6, 6, 8], [3, 3]]].forEach(([c, p, s]) => {
-        const m = new T.Mesh(new T.PlaneGeometry(s[0], s[1]), new T.MeshBasicMaterial({ color: c, side: T.DoubleSide }));
-        m.position.set(p[0], p[1], p[2]); m.lookAt(0, 0, 0); env.add(m);
+    // ---------- Traînées lumineuses : décor de ~1,6 s derrière le titre, puis retrait du canvas ----------
+    function lightTrails() {
+      const cv = $('#trails'), hero = $('.hero');
+      if (!cv) return;
+      const g = reduce ? null : cv.getContext('2d');
+      if (!g) return cv.remove();
+      const hr = hero.getBoundingClientRect(), W = hr.width, H = hr.height, dpr = Math.min(devicePixelRatio || 1, 2);
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); g.scale(dpr, dpr);
+      const rnd = (a, b) => a + Math.random() * (b - a);
+      const streaks = [...document.querySelectorAll('.hero .ch')].map((el, i) => {
+        const r = el.getBoundingClientRect(), ex = r.left - hr.left + r.width / 2, ey = r.top - hr.top + r.height / 2;
+        const left = i % 2 === 0, sx = left ? -0.12 * W : 1.12 * W, sy = rnd(0.1, 0.9) * H;
+        return { sx, sy, cx: (sx + ex) / 2 + rnd(-0.1, 0.1) * W, cy: rnd(0, 1) * H, ex, ey, t0: 0.05 + i * 0.05, t1: 0.8 + i * 0.05, red: !!el.closest('.r') };
       });
-      scene.environment = pm.fromScene(env, 0.04).texture;
-      pm.dispose();
-
-      scene.add(new T.AmbientLight(0xffffff, 0.25));
-      const key = new T.DirectionalLight(0xffffff, 1.1); key.position.set(-5, 7, 8); scene.add(key);
-      const rim = new T.DirectionalLight(0xff5544, 0.9); rim.position.set(6, 3, -6); scene.add(rim);
-      const under = new T.PointLight(0xe63027, 2.2, 14); under.position.set(0, -2.6, 2.5); scene.add(under);
-
-      const M = (color, roughness, metalness, extra) => new T.MeshStandardMaterial(Object.assign({ color, roughness, metalness }, extra || {}));
-      const rubber = M(0x151517, 0.92, 0), paint = M(0xe63027, 0.28, 0.35), rimMat = M(0x1c1c20, 0.35, 0.8, { side: T.DoubleSide });
-      const steel = M(0xc4c4cc, 0.22, 0.95), alu = M(0x8e8e98, 0.35, 0.85), dark = M(0x232328, 0.55, 0.6);
-      const carbon = M(0x141418, 0.35, 0.4), seatMat = M(0x0f0f11, 0.95, 0), gold = M(0xd4a020, 0.3, 0.85);
-      const ti = M(0xa0a2ad, 0.28, 0.95);
-      const discMat = M(0xcfcfd4, 0.18, 0.95, { emissive: 0xff3300, emissiveIntensity: 0, side: T.DoubleSide });
-      const ledMat = new T.MeshBasicMaterial({ color: 0xff1a1a });
-      const amber = new T.MeshBasicMaterial({ color: 0xff9f1a });
-      const V = (x, y, z) => new T.Vector3(x, y, z || 0);
-      const UP = V(0, 1, 0);
-      const dummy = new T.Object3D();
-
-      // Cylindre entre deux points
-      const rod = (a, b, r, mat, seg) => {
-        const d = new T.Vector3().subVectors(b, a);
-        const m = new T.Mesh(new T.CylinderGeometry(r, r, d.length(), seg || 10), mat);
-        m.position.copy(a).addScaledVector(d, 0.5);
-        m.quaternion.setFromUnitVectors(UP, d.clone().normalize());
-        return m;
-      };
-      // Pièces répétées (instanciées pour limiter les appels de dessin)
-      const inst = (geo, mat, n, place) => {
-        const im = new T.InstancedMesh(geo, mat, n);
-        for (let i = 0; i < n; i++) { dummy.position.set(0, 0, 0); dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1); dummy.quaternion.identity(); place(i, dummy); dummy.updateMatrix(); im.setMatrixAt(i, dummy.matrix); }
-        return im;
-      };
-      // Profil latéral extrudé, qui s'affine vers l'arrière
-      const shell = (shape, depth, mat, taper) => {
-        const g = new T.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelThickness: 0.07, bevelSize: 0.06, bevelSegments: 3, curveSegments: 16 });
-        g.translate(0, 0, -depth / 2);
-        const p = g.attributes.position;
-        for (let i = 0; i < p.count; i++) p.setZ(i, p.getZ(i) * taper(p.getX(i)));
-        g.computeVertexNormals();
-        return new T.Mesh(g, mat);
-      };
-      const glowTex = (() => {
-        const c = document.createElement('canvas'); c.width = c.height = 128;
-        const g = c.getContext('2d'), grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-        grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.25, 'rgba(255,255,255,.45)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
-        g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
-        return new T.CanvasTexture(c);
-      })();
-
-      const bike = new T.Group();   // pivot (rotation lente)
-      const model = new T.Group();  // pièces, centrées
-      model.position.set(1.2, -0.45, 0);
-      bike.add(model); scene.add(bike);
-
-      // ---- Roue arrière (tourne autour de l'axe Z) ----
-      const wheel = new T.Group(); model.add(wheel);
-      const tyre = new T.Mesh(new T.TorusGeometry(2.02, 0.43, 28, 120), rubber);
-      tyre.scale.z = 1.12; wheel.add(tyre);
-      // Bande de roulement en chevrons
-      const TR = 56;
-      wheel.add(inst(new T.BoxGeometry(0.08, 0.11, 0.36), rubber, TR * 2, (i, d) => {
-        const k = i % TR, side = i < TR ? 1 : -1, a = (k + (side > 0 ? 0 : 0.5)) / TR * Math.PI * 2;
-        d.position.set(Math.cos(a) * 2.44, Math.sin(a) * 2.44, side * 0.2);
-        d.rotation.set(0, 0, a); d.rotateX(side * 0.55);
-      }));
-      // Jante à rayons
-      const band = new T.Mesh(new T.CylinderGeometry(1.6, 1.6, 0.44, 72, 1, true), rimMat);
-      band.rotation.x = Math.PI / 2; wheel.add(band);
-      [-0.22, 0.22].forEach(z => { const f = new T.Mesh(new T.TorusGeometry(1.62, 0.055, 10, 72), paint); f.position.z = z; wheel.add(f); });
-      const hub = new T.Mesh(new T.CylinderGeometry(0.3, 0.3, 0.64, 28), alu); hub.rotation.x = Math.PI / 2; wheel.add(hub);
-      const SP = 36;
-      wheel.add(inst(new T.CylinderGeometry(0.018, 0.018, 1, 5), steel, SP, (i, d) => {
-        const a = i / SP * Math.PI * 2, z0 = i % 2 ? 0.27 : -0.27;
-        const a1 = V(Math.cos(a) * 0.27, Math.sin(a) * 0.27, z0), b1 = V(Math.cos(a + 0.38) * 1.57, Math.sin(a + 0.38) * 1.57, z0 * 0.3);
-        const dv = new T.Vector3().subVectors(b1, a1);
-        d.position.copy(a1).addScaledVector(dv, 0.5);
-        d.quaternion.setFromUnitVectors(UP, dv.clone().normalize());
-        d.scale.set(1, dv.length(), 1);
-      }));
-      // Disque de frein percé (côté visible)
-      const disc = new T.Mesh(new T.RingGeometry(0.66, 1.24, 72), discMat); disc.position.z = 0.4; wheel.add(disc);
-      const carrier = new T.Mesh(new T.RingGeometry(0.3, 0.68, 40), alu); carrier.position.z = 0.39; wheel.add(carrier);
-      wheel.add(inst(new T.CircleGeometry(0.045, 10), new T.MeshBasicMaterial({ color: 0x0a0a0a }), 30, (i, d) => {
-        const a = i / 30 * Math.PI * 2, r = i % 2 ? 0.88 : 1.04;
-        d.position.set(Math.cos(a) * r, Math.sin(a) * r, 0.405);
-      }));
-      // Couronne de transmission (côté opposé)
-      const sprocket = new T.Mesh(new T.CylinderGeometry(1.02, 1.02, 0.05, 48), alu); sprocket.rotation.x = Math.PI / 2; sprocket.position.z = -0.4; wheel.add(sprocket);
-      wheel.add(inst(new T.BoxGeometry(0.12, 0.09, 0.05), alu, 42, (i, d) => {
-        const a = i / 42 * Math.PI * 2;
-        d.position.set(Math.cos(a) * 1.08, Math.sin(a) * 1.08, -0.4); d.rotation.z = a;
-      }));
-
-      // ---- Étrier de frein (fixe) ----
-      const ca = 2.35;
-      const caliper = new T.Mesh(new T.BoxGeometry(0.34, 0.72, 0.32), gold);
-      caliper.position.set(Math.cos(ca) * 1.02, Math.sin(ca) * 1.02, 0.42); caliper.rotation.z = ca; model.add(caliper);
-      model.add(rod(V(Math.cos(ca) * 0.9, Math.sin(ca) * 0.9, 0.5), V(-0.9, 0.3, 0.62), 0.05, dark));
-
-      // ---- Bras oscillant, axe ----
-      const PIV = V(-4.3, 0.75);
-      [-0.66, 0.66].forEach(z => {
-        const a = V(0, 0, z), b = V(PIV.x, PIV.y, z * 0.85), d = new T.Vector3().subVectors(b, a);
-        const arm = new T.Mesh(new T.BoxGeometry(d.length(), 0.38, 0.16), alu);
-        arm.position.copy(a).addScaledVector(d, 0.5);
-        arm.rotation.z = Math.atan2(d.y, d.x); arm.rotation.y = -Math.atan2(d.z, Math.hypot(d.x, d.y));
-        model.add(arm);
-        const nut = new T.Mesh(new T.CylinderGeometry(0.17, 0.17, 0.12, 6), steel); nut.rotation.x = Math.PI / 2; nut.position.z = z * 1.2; model.add(nut);
-      });
-      model.add(rod(V(0, 0, -0.85), V(0, 0, 0.85), 0.08, steel));
-      model.add(rod(V(PIV.x + 0.5, PIV.y - 0.08, -0.6), V(PIV.x + 0.5, PIV.y - 0.08, 0.6), 0.12, alu));
-      model.add(rod(V(PIV.x, PIV.y, -0.75), V(PIV.x, PIV.y, 0.75), 0.13, dark));
-
-      // ---- Chaîne et pignon ----
-      const front = V(-4.0, 0.55, -0.4), FR = 0.38, RR = 1.1;
-      const pin = new T.Mesh(new T.CylinderGeometry(FR, FR, 0.08, 24), dark); pin.rotation.x = Math.PI / 2; pin.position.copy(front); model.add(pin);
-      const runs = [[V(0, RR, -0.4), V(front.x, front.y + FR, -0.4)], [V(front.x, front.y - FR, -0.4), V(0, -RR, -0.4)]];
-      const LINKS = 34;
-      const chain = new T.InstancedMesh(new T.BoxGeometry(0.15, 0.06, 0.09), dark, LINKS * 2);
-      model.add(chain);
-      let chainOff = 0;
-      const placeChain = () => {
-        runs.forEach(([a, b], r) => {
-          const d = new T.Vector3().subVectors(b, a), ang = Math.atan2(d.y, d.x);
-          for (let i = 0; i < LINKS; i++) {
-            const t = ((i / LINKS) + chainOff) % 1;
-            dummy.position.copy(a).addScaledVector(d, t); dummy.rotation.set(0, 0, ang); dummy.scale.set(1, 1, 1);
-            dummy.updateMatrix(); chain.setMatrixAt(r * LINKS + i, dummy.matrix);
+      for (let k = 0; k < 5; k++) { const y = rnd(0.2, 0.8) * H; streaks.push({ sx: -0.2 * W, sy: y, cx: 0.5 * W, cy: y + rnd(-60, 60), ex: 1.2 * W, ey: y + rnd(-80, 80), t0: rnd(0, 0.5), t1: rnd(1.1, 1.5), red: k % 2 === 0, pass: true }); }
+      const qb = (a, b, c, t) => (1 - t) * (1 - t) * a + 2 * (1 - t) * t * b + t * t * c;
+      const ease = t => 1 - Math.pow(1 - t, 3);
+      const END = 1.6, FADE = 0.5, start = performance.now();
+      g.lineCap = 'round';
+      (function frame(now) {
+        const t = Math.max(0, (now - start) / 1000), fade = t > END ? Math.max(0, 1 - (t - END) / FADE) : 1;
+        g.clearRect(0, 0, W, H);
+        g.globalCompositeOperation = 'lighter';
+        streaks.forEach(s => {
+          const u = (t - s.t0) / (s.t1 - s.t0);
+          if (u <= 0) return;
+          const head = ease(Math.min(u, 1)), len = 0.3 * (u > 1 ? Math.max(0, 1 - (u - 1) * 3) : 1), tail = Math.max(0, head - len);
+          const col = s.red ? '255,64,52' : '255,255,255', N = 14;
+          for (let k = 0; k < N && head > tail; k++) {
+            const a = tail + (head - tail) * k / N, b = tail + (head - tail) * (k + 1) / N, al = (k + 1) / N * fade * (s.pass ? 0.3 : 0.8);
+            g.beginPath(); g.moveTo(qb(s.sx, s.cx, s.ex, a), qb(s.sy, s.cy, s.ey, a)); g.lineTo(qb(s.sx, s.cx, s.ex, b), qb(s.sy, s.cy, s.ey, b));
+            g.strokeStyle = `rgba(${col},${al * 0.22})`; g.lineWidth = 8 * (k + 1) / N; g.stroke();
+            g.strokeStyle = `rgba(${col},${al})`; g.lineWidth = 1.6; g.stroke();
+          }
+          if (!s.pass && u >= 1) {
+            const f = Math.max(0, 1 - (u - 1) * 1.6) * fade, rad = 34;
+            if (f > 0) {
+              const gr = g.createRadialGradient(s.ex, s.ey, 0, s.ex, s.ey, rad);
+              gr.addColorStop(0, `rgba(${col},${0.5 * f})`); gr.addColorStop(1, `rgba(${col},0)`);
+              g.fillStyle = gr; g.fillRect(s.ex - rad, s.ey - rad, rad * 2, rad * 2);
+            }
           }
         });
-        chain.instanceMatrix.needsUpdate = true;
-      };
-      placeChain();
-
-      // ---- Amortisseur avec ressort ----
-      const S1 = V(-2.3, 0.62), S2 = V(-3.3, 2.35);
-      model.add(rod(S1, S2, 0.09, steel, 12));
-      const axis = new T.Vector3().subVectors(S2, S1), len = axis.length(); axis.normalize();
-      const n1 = V(0, 0, 1), n2 = new T.Vector3().crossVectors(axis, n1).normalize();
-      const helix = [];
-      for (let i = 0; i <= 160; i++) {
-        const t = i / 160, a = t * Math.PI * 2 * 9;
-        helix.push(S1.clone().addScaledVector(axis, len * (0.12 + t * 0.62)).addScaledVector(n1, Math.cos(a) * 0.21).addScaledVector(n2, Math.sin(a) * 0.21));
-      }
-      model.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(helix), 320, 0.035, 6), paint));
-
-      // ---- Cadre arrière (boucle) ----
-      [-0.32, 0.32].forEach(z => {
-        model.add(rod(V(-3.95, 1.05, z), V(-0.2, 2.62, z * 0.8), 0.06, dark));
-        model.add(rod(V(-4.0, 2.55, z), V(0.6, 2.82, z * 0.75), 0.06, dark));
-      });
-
-      // ---- Coque arrière, selle ----
-      const V2 = (x, y) => new T.Vector2(x, y);
-      const tail = new T.Shape();
-      tail.moveTo(-3.4, 2.32);
-      tail.splineThru([V2(-1.5, 2.48), V2(0.4, 2.74), V2(1.6, 3.04), V2(2.06, 3.2)]);
-      tail.lineTo(2.1, 3.44);
-      tail.splineThru([V2(1.4, 3.42), V2(0.2, 3.2), V2(-1.2, 3.0)]);
-      tail.lineTo(-3.4, 2.97);
-      model.add(shell(tail, 0.86, paint, x => 1 - Math.max(0, (x + 1.2) / 3.3) * 0.48));
-      const seat = new T.Shape();
-      seat.moveTo(-4.0, 2.96); seat.lineTo(-1.25, 3.0);
-      seat.quadraticCurveTo(-0.75, 3.05, -0.62, 3.3);
-      seat.quadraticCurveTo(-1.9, 3.38, -4.0, 3.32);
-      model.add(shell(seat, 0.96, seatMat, x => 1 - Math.max(0, (x + 2.2) / 2) * 0.12));
-      // Liseré noir sous la coque
-      const strip = new T.Mesh(new T.BoxGeometry(2.2, 0.05, 0.5), carbon); strip.position.set(0.6, 2.75, 0); strip.rotation.z = 0.26; model.add(strip);
-
-      // ---- Feu arrière LED rouge ----
-      const leds = new T.Group(); model.add(leds);
-      const led1 = new T.Mesh(new T.BoxGeometry(0.05, 0.11, 0.42), ledMat); led1.position.set(2.14, 3.33, 0); leds.add(led1);
-      const led2 = new T.Mesh(new T.BoxGeometry(0.05, 0.04, 0.34), ledMat); led2.position.set(2.12, 3.22, 0); leds.add(led2);
-      const tailGlow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xff2a1a, blending: T.AdditiveBlending, transparent: true, depthWrite: false }));
-      tailGlow.position.set(2.3, 3.3, 0); tailGlow.scale.set(2.2, 1.4, 1); model.add(tailGlow);
-      const tailLight = new T.PointLight(0xff2010, 1.6, 6); tailLight.position.set(2.7, 3.2, 0); model.add(tailLight);
-
-      // ---- Support et plaque d'immatriculation ----
-      model.add(rod(V(1.0, 2.7, 0), V(2.08, 2.0, 0), 0.06, dark));
-      const pc = document.createElement('canvas'); pc.width = 512; pc.height = 320;
-      const x = pc.getContext('2d');
-      x.fillStyle = '#fff'; x.fillRect(0, 0, 512, 320);
-      x.fillStyle = '#0a3a9a'; x.fillRect(0, 0, 70, 320); x.fillRect(442, 0, 70, 320);
-      x.fillStyle = '#ffcc00';
-      for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; x.beginPath(); x.arc(35 + Math.cos(a) * 20, 64 + Math.sin(a) * 20, 4, 0, 7); x.fill(); }
-      x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = 'bold 54px sans-serif'; x.fillText('F', 35, 292);
-      x.font = 'bold 44px sans-serif'; x.fillText('94', 477, 292);
-      x.fillStyle = '#111'; x.font = 'bold 110px sans-serif'; x.fillText('MC-394', 256, 140, 360); x.fillText('CL', 256, 280, 360);
-      x.strokeStyle = '#111'; x.lineWidth = 8; x.strokeRect(4, 4, 504, 312);
-      const plateTex = new T.CanvasTexture(pc);
-      const plate = new T.Mesh(new T.BoxGeometry(0.03, 0.56, 0.9), [M(0xffffff, 0.5, 0, { map: plateTex }), dark, dark, dark, dark, dark]);
-      plate.position.set(2.16, 1.75, 0); model.add(plate);
-      [-0.55, 0.55].forEach(z => {
-        model.add(rod(V(2.0, 2.05, 0), V(2.05, 2.05, z), 0.025, dark));
-        const ind = new T.Mesh(new T.BoxGeometry(0.12, 0.08, 0.1), amber); ind.position.set(2.08, 2.05, z); model.add(ind);
-      });
-
-      // ---- Garde-boue intérieur ----
-      const hugger = new T.Mesh(new T.TorusGeometry(2.6, 0.06, 6, 40, 1.35), carbon);
-      hugger.scale.z = 5; hugger.rotation.z = 0.8; model.add(hugger);
-
-      // ---- Silencieux d'échappement ----
-      const E1 = V(-1.7, 0.95, 1.0), E2 = V(1.0, 2.05, 1.0), ed = new T.Vector3().subVectors(E2, E1).normalize();
-      model.add(rod(E1, E2, 0.32, ti, 28));
-      const cap = rod(E2, E2.clone().addScaledVector(ed, 0.36), 0.3, carbon, 28);
-      cap.geometry = new T.CylinderGeometry(0.22, 0.32, cap.geometry.parameters.height, 28); model.add(cap);
-      model.add(rod(E2.clone().addScaledVector(ed, 0.3), E2.clone().addScaledVector(ed, 0.5), 0.1, dark, 16));
-      model.add(rod(E1.clone().addScaledVector(ed, -0.25), E1.clone().addScaledVector(ed, 0.02), 0.33, carbon, 28));
-      model.add(rod(V(-4.6, -0.4, 0.45), V(-2.6, 0.32, 0.9), 0.1, steel));
-      model.add(rod(V(-2.6, 0.32, 0.9), E1, 0.1, steel));
-      model.add(rod(V(-0.2, 1.65, 1.0), V(-0.4, 2.55, 0.3), 0.04, dark));
-
-      // ---- Halo lumineux au sol ----
-      const floor = new T.Mesh(new T.PlaneGeometry(11, 4.5), new T.MeshBasicMaterial({ map: glowTex, color: 0xe63027, transparent: true, opacity: 0.55, blending: T.AdditiveBlending, depthWrite: false }));
-      floor.rotation.x = -Math.PI / 2; floor.position.set(-1.0, -2.48, 0); model.add(floor);
-
-      // ---- Mise en page, animation ----
-      let desk = true;
-      const resize = () => {
-        const wdt = canvas.clientWidth, hgt = canvas.clientHeight;
-        if (!wdt || !hgt) return;
-        renderer.setSize(wdt, hgt, false);
-        camera.aspect = wdt / hgt; camera.updateProjectionMatrix();
-        desk = wdt > 900;
-        bike.position.set(desk ? 3.5 : 0, desk ? -0.2 : 1.7, 0);
-        bike.scale.setScalar(desk ? 0.74 : 0.5);
-        if (reduce) renderer.render(scene, camera);
-      };
-      const mouse = { x: 0, y: 0 };
-      addEventListener('pointermove', e => { mouse.x = e.clientX / innerWidth - 0.5; mouse.y = e.clientY / innerHeight - 0.5; }, { passive: true });
-
-      const BASE = -1.25;
-      bike.rotation.y = BASE;
-      let spin = 0, running = false, onScreen = true;
-      const step = now => {
-        boost *= 0.97;
-        const target = 0.012 + scrollSpeed * 0.0035 + boost * 0.3;
-        spin += (target - spin) * 0.08;
-        wheel.rotation.z += spin;
-        chainOff = (chainOff + spin * 0.18) % 1;
-        placeChain();
-        const yaw = BASE + Math.sin(now * 0.00022) * 0.38 + mouse.x * 0.3;
-        bike.rotation.y += (yaw - bike.rotation.y) * 0.04;
-        bike.rotation.x += (mouse.y * 0.15 - bike.rotation.x) * 0.04;
-        discMat.emissiveIntensity = Math.min(spin * 5, 1.1);
-        const pulse = 0.8 + Math.sin(now * 0.004) * 0.2;
-        tailGlow.material.opacity = pulse; tailLight.intensity = 1.2 + pulse * 0.6;
-        floor.material.opacity = 0.4 + Math.min(spin * 4, 0.35);
-      };
-      const loop = now => {
-        if (!running) return;
-        requestAnimationFrame(loop);
-        step(now);
-        renderer.render(scene, camera);
-      };
-      const setRunning = on => {
-        if (reduce) return;
-        if (on && !running) { running = true; requestAnimationFrame(loop); }
-        else if (!on) running = false;
-      };
-      resize();
-      addEventListener('resize', resize);
-      if (reduce) {
-        // Version statique : une seule image, légèrement de trois quarts arrière
-        bike.rotation.y = BASE - 0.15; wheel.rotation.z = 0.4;
-        renderer.render(scene, camera);
-      } else {
-        new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; setRunning(onScreen && !document.hidden); }).observe(canvas);
-        document.addEventListener('visibilitychange', () => setRunning(onScreen && !document.hidden));
-      }
-      requestAnimationFrame(() => canvas.classList.add('ready'));
+        if (t < END + FADE) requestAnimationFrame(frame); else cv.remove();
+      })(start);
     }
+    Promise.race([document.fonts ? document.fonts.ready : null, new Promise(r => setTimeout(r, 350))]).then(lightTrails);
+
+    // ---------- Moto 3D (three.js) et défilement doux (Lenis) : chargés à la demande ----------
+    // Mobile ou « économie de données » : au premier geste ; ordinateur : après le chargement, au repos.
+    const LENIS_JS = 'https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js';
     const idle = window.requestIdleCallback || (cb => setTimeout(cb, 300));
-    const startBike = () => idle(() => load(THREE_JS).then(() => { try { initBike(); } catch (err) { /* WebGL indisponible : le fond dégradé reste */ } }).catch(() => {}), { timeout: 2500 });
-    // Mobile ou mode « économie de données » : la 3D (décor à 40 % d'opacité) n'est chargée qu'au premier geste
-    // de l'utilisateur, pour garder un affichage initial rapide. Ordinateur : chargée après l'affichage, au repos.
     const lightMode = matchMedia('(max-width: 760px)').matches || !!(navigator.connection && navigator.connection.saveData);
+    const desktop = matchMedia('(min-width: 761px)').matches;
+    let lenis = null;
+    // Défilement vers une ancre : Lenis si actif (sous l'en-tête fixe), sinon défilement natif
+    const goTo = (target, after) => {
+      const el = typeof target === 'string' ? $(target) : target;
+      if (!el) return;
+      if (lenis) lenis.scrollTo(el, { offset: -80, onComplete: after });
+      else { el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); if (after) setTimeout(after, reduce ? 0 : 700); }
+    };
+    function startLenis() {
+      // Ordinateur uniquement (pointeur précis), jamais en mouvement réduit ni sur écran tactile
+      if (reduce || !hasG || lightMode || !matchMedia('(pointer: fine)').matches) return;
+      load(LENIS_JS).then(() => {
+        lenis = new Lenis({ lerp: 0.12, smoothWheel: true });
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add(t => lenis.raf(t * 1000));
+        gsap.ticker.lagSmoothing(0);
+      }).catch(() => {});
+    }
+    document.addEventListener('click', e => {
+      if (!lenis || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const a = e.target.closest('a[href^="#"]');
+      if (!a || a.getAttribute('href').length < 2) return;
+      const el = document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));
+      if (!el) return;
+      e.preventDefault();
+      lenis.scrollTo(el, { offset: -80 });
+      history.pushState(null, '', a.getAttribute('href'));
+    });
+
+    function onBike(api) {
+      // Sélecteur de teinte (ordinateur) : discret, à côté des boutons d'appel
+      const paint = $('#paint');
+      if (!lightMode) {
+        paint.hidden = false;
+        paint.querySelectorAll('.sw').forEach(b => b.addEventListener('click', () => {
+          paint.querySelectorAll('.sw').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+          api.setPaint(b.dataset.paint);
+          $('#paint-name').textContent = api.paints[b.dataset.paint].label;
+        }));
+      }
+      if (api.canTour && hasG && !reduce && desktop) enableTour(api);
+    }
+    // Visite des services (ordinateur) : épinglage court, les cartes restent au premier plan
+    function enableTour(api) {
+      const stage = $('#tour-stage');
+      // Déjà atteinte ou dépassée : on garde la liste (aucun saut de mise en page)
+      if (stage.getBoundingClientRect().top <= 0) return;
+      // La vue 3D de la visite (second contexte WebGL) n'est créée qu'ici, quand la visite s'active vraiment
+      if (!api.startTour()) return;
+      const sec = $('#services');
+      const steps = [...document.querySelectorAll('.tour-step')], dots = [...document.querySelectorAll('.tour-dots li')];
+      let cur = 0, st = null;
+      const setStep = i => {
+        if (i === cur) return;
+        cur = i;
+        steps.forEach((s, k) => s.classList.toggle('active', k === i));
+        dots.forEach((d, k) => d.classList.toggle('on', k === i));
+      };
+      // Navigation au clavier : une carte qui reçoit le focus est amenée à l'écran
+      steps.forEach((s, k) => s.addEventListener('focusin', () => {
+        if (!st || k === cur) return;
+        const y = st.start + (st.end - st.start) * k / 5;
+        setStep(k);
+        if (lenis) lenis.scrollTo(y, { immediate: true }); else scrollTo(0, y);
+      }));
+      // Ordinateur uniquement : sous 761 px (fenêtre réduite, rotation), retour à la liste simple
+      gsap.matchMedia().add('(min-width: 761px)', () => {
+        sec.classList.add('on');
+        const proxy = { p: 0 };
+        const tl = gsap.timeline({ scrollTrigger: { trigger: stage, start: 'top top', end: '+=250%', pin: true, scrub: 0.6, refreshPriority: 2 } });
+        tl.to(proxy, { p: 1, ease: 'none', onUpdate: () => { api.tour(proxy.p); setStep(Math.round(proxy.p * 5)); } });
+        st = tl.scrollTrigger;
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+        return () => { st = null; sec.classList.remove('on'); setStep(0); api.tour(0); };
+      });
+    }
+    function start3D() {
+      return import('./assets/bike3d.js')
+        .then(m => m.init({ hero: $('#bike3d'), tourCanvas: desktop ? $('#tour3d') : null, reduce, mobile: lightMode, site: SITE }))
+        .then(onBike)
+        .catch(() => { /* WebGL ou CDN indisponible : le fond dégradé reste, les services restent en liste */ });
+    }
+    const startHeavy = () => idle(() => { start3D(); startLenis(); }, { timeout: 2500 });
     if (lightMode) {
       const evs = ['pointerdown', 'touchstart', 'scroll', 'keydown'];
-      const go = () => { evs.forEach(ev => removeEventListener(ev, go)); startBike(); };
+      const go = () => { evs.forEach(ev => removeEventListener(ev, go)); startHeavy(); };
       evs.forEach(ev => addEventListener(ev, go, { passive: true }));
-    } else if (document.readyState === 'complete') startBike(); else addEventListener('load', startBike);
+    } else if (document.readyState === 'complete') startHeavy(); else addEventListener('load', startHeavy);
 
     // ---------- Compteur de vitesse, progression, retour en haut ----------
     const spdEl = $('#spd'), gearEl = $('#gear'), spdBar = $('#spd-bar');
-    const progress = $('#progress'), toTop = $('#to-top'), ring = $('#ring'), header = $('#top');
+    const progress = $('#progress'), toTop = $('#to-top'), ring = $('#ring'), header = $('#top'), heroEl = $('#accueil');
     let lastY = scrollY, spd = 0;
     (function hud() {
       requestAnimationFrame(hud);
@@ -1659,6 +1641,7 @@
       spd += (Math.min(d * 2.2, 299) - spd) * 0.08;
       if (spd < 0.05) spd = 0;
       scrollSpeed = spd;
+      if (window.MC3D) MC3D.speed(scrollSpeed);
       spdEl.textContent = String(Math.round(spd)).padStart(3, '0');
       gearEl.textContent = spd < 5 ? 'N' : Math.min(6, 1 + Math.floor(spd / 45));
       spdBar.style.width = spd / 299 * 100 + '%';
@@ -1670,10 +1653,11 @@
       ring.style.strokeDashoffset = 150.8 * (1 - p);
       toTop.classList.toggle('show', scrollY > 600);
       header.classList.toggle('scrolled', scrollY > 30);
+      document.documentElement.classList.toggle('past-hero', scrollY > heroEl.offsetHeight * 0.8);
     };
     addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    toTop.addEventListener('click', () => scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
+    toTop.addEventListener('click', () => (lenis ? lenis.scrollTo(0) : scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })));
 
     // ---------- Curseur, boutons aimantés, projecteur sur les cartes ----------
     if (matchMedia('(hover: hover)').matches && !reduce) {
@@ -2242,22 +2226,115 @@
       ok.hidden = false;
       ok.focus({ preventScroll: true });
       ok.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
-      boost = 1;
+      if (window.MC3D) MC3D.boost(1); // la moto 3D accélère : demande envoyée
     });
+
+    // ---------- « Ta moto en une phrase » : une saisie, une marque, un bouton → préremplit le formulaire ----------
+    {
+      const oneForm = $('#one-form'), oneQ = $('#one-q'), oneHint = $('#one-hint'), lbBtn = $('#one-brand'), lbList = $('#one-list');
+      const OPTS = [...BRANDS, 'Autre'];
+      let brand = '', active = 0;
+      lbList.innerHTML = OPTS.map((b, i) => `<li role="option" id="one-opt-${i}" aria-selected="false">${b}</li>`).join('');
+      const items = [...lbList.children];
+      const focusOpt = i => {
+        active = (i + items.length) % items.length;
+        items.forEach((li, k) => li.classList.toggle('focus', k === active));
+        lbList.setAttribute('aria-activedescendant', items[active].id);
+        items[active].scrollIntoView({ block: 'nearest' });
+      };
+      const openLb = () => { lbList.hidden = false; lbBtn.setAttribute('aria-expanded', 'true'); focusOpt(Math.max(0, OPTS.indexOf(brand))); lbList.focus(); };
+      const closeLb = refocus => { lbList.hidden = true; lbBtn.setAttribute('aria-expanded', 'false'); if (refocus) lbBtn.focus(); };
+      const choose = i => {
+        brand = OPTS[i];
+        items.forEach((li, k) => li.setAttribute('aria-selected', String(k === i)));
+        lbBtn.textContent = brand; lbBtn.classList.remove('empty');
+        closeLb(true);
+      };
+      lbBtn.addEventListener('click', () => (lbList.hidden ? openLb() : closeLb(false)));
+      lbBtn.addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); openLb(); } });
+      items.forEach((li, i) => { li.addEventListener('click', () => choose(i)); li.addEventListener('pointermove', () => focusOpt(i)); });
+      lbList.addEventListener('keydown', e => {
+        const k = e.key;
+        if (k === 'ArrowDown' || k === 'ArrowRight') focusOpt(active + 1);
+        else if (k === 'ArrowUp' || k === 'ArrowLeft') focusOpt(active - 1);
+        else if (k === 'Home') focusOpt(0);
+        else if (k === 'End') focusOpt(items.length - 1);
+        else if (k === 'Enter' || k === ' ') choose(active);
+        else if (k === 'Escape') closeLb(true);
+        else if (k === 'Tab') return closeLb(false);
+        else if (k.length === 1 && /\S/.test(k)) {
+          // Saisie d'une lettre : marque suivante commençant par cette lettre
+          const order = OPTS.map((o, x) => (active + 1 + x) % OPTS.length);
+          const j = order.find(x => OPTS[x].toLowerCase().startsWith(k.toLowerCase()));
+          if (j === undefined) return;
+          focusOpt(j);
+        } else return;
+        e.preventDefault();
+      });
+      document.addEventListener('pointerdown', e => { if (!lbList.hidden && !e.target.closest('.lb')) closeLb(false); });
+      // Mots-clés → intervention (sans accents ; « dépann » est testé avant « panne »)
+      const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+      const guess = s => {
+        const t = norm(s);
+        if (/frein/.test(t)) return 'Freinage';
+        if (/pneu/.test(t)) return 'Pneus';
+        if (/remorqu|depann/.test(t)) return 'Dépannage';
+        if (/vidange|revision|entretien/.test(t)) return 'Entretien';
+        if (/demarr|panne|voyant/.test(t)) return 'Diagnostic';
+        return 'Réparation';
+      };
+      oneQ.addEventListener('input', () => { if (oneQ.value.trim()) setHint(oneHint, ''); });
+      oneForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const txt = oneQ.value.trim();
+        if (!txt) { setHint(oneHint, 'Décrivez votre besoin en une phrase, par exemple « mes freins grincent ».', 'ko'); oneQ.focus(); return; }
+        setHint(oneHint, '');
+        if (brand) $('#brand-select').value = brand === 'Autre' ? 'Autre marque' : brand;
+        $('#intervention').value = guess(txt);
+        form.elements.message.value = txt;
+        // Premier champ obligatoire encore vide (les champs d'adresse masqués sont ignorés)
+        const first = [...form.querySelectorAll('input[required], select[required], textarea[required]')]
+          .find(el => el.type !== 'radio' && el.type !== 'checkbox' && !el.closest('[hidden]') && !el.value.trim());
+        goTo(form, () => (first || form.elements.nom).focus({ preventScroll: true }));
+      });
+    }
 
     // ---------- Animations au défilement (GSAP) ----------
     if (hasG && !reduce) {
+      // Titres h2 : révélation mot par mot derrière un masque (le titre complet reste lu via aria-label)
+      document.querySelectorAll('main h2.rv').forEach(h => {
+        const text = h.textContent.trim();
+        h.setAttribute('aria-label', text);
+        h.innerHTML = text.split(/\s+/).map(wd => `<span class="mw" aria-hidden="true"><i>${escHtml(wd)}</i></span>`).join(' ');
+        h.classList.remove('rv');
+        gsap.from(h.querySelectorAll('.mw > i'), { yPercent: 105, duration: 0.8, ease: 'power3.out', stagger: 0.04, scrollTrigger: { trigger: h, start: 'top 92%' } });
+      });
+
       // Mots estompés seulement quand la section approche (texte lisible tant qu'elle n'est pas atteinte)
       ScrollTrigger.create({ trigger: '#manifeste', start: 'top bottom', once: true, onEnter: () => gsap.set('#mtext .w', { opacity: 0.12 }) });
-      gsap.fromTo('#mtext .w', { opacity: 0.12 }, { opacity: 1, stagger: 0.1, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '#manifeste', start: 'top top', end: '+=130%', scrub: true, pin: true } });
+      gsap.fromTo('#mtext .w', { opacity: 0.12 }, { opacity: 1, stagger: 0.1, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '#manifeste', start: 'top top', end: '+=130%', scrub: true, pin: true, refreshPriority: 3 } });
 
-      const mm = gsap.matchMedia();
-      mm.add('(min-width: 761px)', () => {
-        const track = $('#hs-track');
-        $('#services').classList.add('pinned');
-        const dist = () => track.scrollWidth - innerWidth;
-        gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '#services', start: 'top top', end: () => '+=' + dist(), scrub: 1, pin: true, invalidateOnRefresh: true } });
-        return () => $('#services').classList.remove('pinned');
+      // Chiffres géants (ordinateur) : un chiffre par écran, séquence épinglée courte. Mobile : simple liste.
+      gsap.matchMedia().add('(min-width: 761px)', () => {
+        $('#chiffres').classList.add('on');
+        const figs = gsap.utils.toArray('.fig');
+        const tl = gsap.timeline({ scrollTrigger: { trigger: '#figs-stage', start: 'top top', end: '+=200%', pin: true, scrub: 0.5, refreshPriority: 1 } });
+        figs.forEach((f, i) => {
+          const num = f.querySelector('[data-count]'), max = +num.dataset.count, o = { v: i ? 0 : max };
+          if (i === 0) gsap.set(f, { autoAlpha: 1 }); // le premier chiffre est visible dès l'arrivée
+          else {
+            num.textContent = '0';
+            tl.fromTo(f, { autoAlpha: 0, yPercent: 12, scale: 0.95 }, { autoAlpha: 1, yPercent: 0, scale: 1, duration: 1 })
+              .to(o, { v: max, duration: 1, ease: 'power2.out', onUpdate: () => { num.textContent = Math.round(o.v); } }, '<');
+          }
+          tl.to({}, { duration: 0.6 });
+          if (i < figs.length - 1) tl.to(f, { autoAlpha: 0, yPercent: -12, duration: 0.7 });
+        });
+        // Sous 761 px : liste simple, chiffres réels
+        return () => {
+          $('#chiffres').classList.remove('on');
+          document.querySelectorAll('.fig [data-count]').forEach(n => { n.textContent = n.dataset.count; });
+        };
       });
 
       gsap.to('.bigm .l1', { xPercent: -30, ease: 'none', scrollTrigger: { trigger: '.bigm', start: 'top bottom', end: 'bottom top', scrub: true } });
@@ -2299,10 +2376,6 @@
         .set(q('.sc4-check'), { opacity: 1, scale: 0 }));
 
       gsap.utils.toArray('.rv').forEach(el => gsap.from(el, { y: 60, opacity: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } }));
-      document.querySelectorAll('[data-count]').forEach(el => {
-        const o = { v: 0 };
-        gsap.to(o, { v: +el.dataset.count, duration: 1.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 90%' }, onUpdate: () => { el.textContent = Math.round(o.v); } });
-      });
       gsap.from('.brand', { y: 40, opacity: 0, stagger: 0.06, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: '#brand-grid', start: 'top 85%' } });
       addEventListener('load', () => ScrollTrigger.refresh());
     }
@@ -2330,8 +2403,7 @@
       book(message, intervention) {
         if (message) form.elements.message.value = message;
         if (intervention && [...$('#intervention').options].some(o => o.value === intervention)) $('#intervention').value = intervention;
-        $('#devis').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-        setTimeout(() => $('#plaque').focus({ preventScroll: true }), reduce ? 0 : 700);
+        goTo('#devis', () => $('#plaque').focus({ preventScroll: true }));
       }
     };
     const chatBtn = $('#chat-btn');

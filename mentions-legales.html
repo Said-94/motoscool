@@ -102,8 +102,13 @@
       <li>Fonds de carte : © les contributeurs d'<a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>, affichés avec la bibliothèque Leaflet.</li>
       <li>Contours des départements : données issues du projet open source france-geojson (Grégoire David), dérivées des données IGN / Etalab.</li>
       <li>Recherche de commune : API Adresse de la Base Adresse Nationale (api-adresse.data.gouv.fr).</li>
-      <li>Animations : GSAP et Three.js ; polices Orbitron et Nunito, hébergées sur le site (licence SIL Open Font License, fichiers issus du projet Fontsource).</li>
+      <li>Animations : GSAP, Lenis et Three.js ; polices Orbitron et Nunito, hébergées sur le site (licence SIL Open Font License, fichiers issus du projet Fontsource).</li>
     </ul>
+
+    <section id="credits-3d" hidden>
+      <h2>Crédits</h2>
+      <p id="credits-3d-line"></p>
+    </section>
 
     <h2>Responsabilité</h2>
     <p>Les informations du site (horaires, zones d'intervention, prestations) sont données à titre indicatif et peuvent évoluer. Les tarifs ne sont fixés qu'après diagnostic et devis accepté. Moto's Cool ne saurait être tenu responsable d'une indisponibilité temporaire du site ou des services tiers qu'il utilise.</p>
@@ -130,7 +135,20 @@
       </ul>
     </div>
   </footer>
+  <!-- Crédit du modèle 3D (licence CC-BY) : affiché seulement si SITE_BIKE.bikeCredit est renseigné dans assets/site-bike.js -->
+  <script src="assets/site-bike.js"></script>
   <script>
+    (function () {
+      var c = window.SITE_BIKE && window.SITE_BIKE.bikeCredit;
+      if (!c || !c.text) return;
+      var line = document.getElementById('credits-3d-line');
+      line.textContent = c.text + (c.url ? ' Source : ' : '');
+      if (c.url && /^https:\/\//.test(c.url)) {
+        var a = document.createElement('a'); a.href = c.url; a.rel = 'noopener'; a.textContent = c.url;
+        line.appendChild(a);
+      }
+      document.getElementById('credits-3d').hidden = false;
+    })();
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
   </script>
 </body>
